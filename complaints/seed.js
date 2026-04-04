@@ -26,15 +26,24 @@ const allowedEmailsToSeed = [
     { email: 'cleanliness@srmist.edu.in', role: 'admin' }
 ];
 
-const usersToSeed = allowedEmailsToSeed.map(m => {
-    return {
-        username: m.email,
-        password: m.role === 'student' ? 'student123' : (m.role === 'admin' ? 'admin123' : 'auth123'),
-        role: m.role,
-        name: m.email.split('@')[0],
-        department: m.role === 'admin' ? m.email.split('@')[0].charAt(0).toUpperCase() + m.email.split('@')[0].slice(1) : null
-    };
-});
+const demoEmails = [
+    'student@srmist.edu.in', 'auth@srmist.edu.in', 'canteen@srmist.edu.in',
+    'academics@srmist.edu.in', 'hostel@srmist.edu.in', 'library@srmist.edu.in',
+    'security@srmist.edu.in', 'transport@srmist.edu.in', 'infrastructure@srmist.edu.in',
+    'cleanliness@srmist.edu.in'
+];
+
+const usersToSeed = allowedEmailsToSeed
+    .filter(m => demoEmails.includes(m.email))
+    .map(m => {
+        return {
+            username: m.email,
+            password: m.role === 'student' ? 'student123' : (m.role === 'admin' ? 'admin123' : 'auth123'),
+            role: m.role,
+            name: m.email.split('@')[0],
+            department: m.role === 'admin' ? m.email.split('@')[0].charAt(0).toUpperCase() + m.email.split('@')[0].slice(1) : null
+        };
+    });
 
 // Custom overrides
 usersToSeed.find(u => u.username === 'student@srmist.edu.in').name = 'Student Portal';
