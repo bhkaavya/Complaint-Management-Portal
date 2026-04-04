@@ -35,10 +35,14 @@ The Complaint Management Portal is a comprehensive full-stack web application de
    Ensure you have PostgreSQL running locally with a user `dtm_user` and database `dtm_complaints`. You may need to modify the configuration block in `complaints/server.js` if your PostgreSQL setup uses different credentials.
 
 4. **Initialize Metadata/Test Data**
-   Run the seeder step to prepare your tables and whitelist your administrative emails:
+   Run the seeder step to prepare your tables, seed initial users, and whitelist your testing emails:
    ```bash
    node complaints/seed.js
    ```
+   **Default Test Credentials (seeded automatically):**
+   - **Student:** `student@srmist.edu.in` | Password: `student123`
+   - **Authenticator:** `auth@srmist.edu.in` | Password: `auth123`
+   - **Admin:** `canteen@srmist.edu.in` | Password: `admin123`
 
 5. **Start the Development Server**
    ```bash
