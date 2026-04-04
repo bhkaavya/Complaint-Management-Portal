@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Management — DTM Portal</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="app-shell">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-mark">🏫</div>
+                <div class="brand">DTM Portal<span>Management View</span></div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Analytics</div>
+                <button class="nav-item active" id="nav-dashboard" onclick="showSection('dashboard')">
+                    <span class="nav-icon">📊</span> Dashboard
+                </button>
+                <div class="nav-section-label">Complaints</div>
+                <button class="nav-item" id="nav-forwarded" onclick="showSection('forwarded')">
+                    <span class="nav-icon">📥</span> Forwarded
+                    <span class="nav-badge" id="nav-fwd-count" style="display:none;"></span>
+                </button>
+                <button class="nav-item rose" id="nav-rejected" onclick="showSection('rejected')">
+                    <span class="nav-icon">❌</span> Rejected
+                </button>
+                <button class="nav-item emerald" id="nav-resolved" onclick="showSection('resolved')">
+                    <span class="nav-icon">✅</span> Resolved
+                </button>
+            </nav>
+            <div class="sidebar-user">
+                <div class="user-avatar" style="background:rgba(16,185,129,0.15);color:#34d399;">M</div>
+                <div class="user-meta">
+                    <div class="user-name" id="admin-name">Management</div>\n                    <div class="user-role" id="admin-role">Admin · Full Access</div>
+                </div>
+                <button class="btn-sidebar-logout" onclick="logout()" title="Sign out">✕</button>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="main-content">
+            <header class="topbar">
+                <div>
+                    <div class="topbar-title" id="topbar-title">Dashboard</div>
+                    <div class="topbar-subtitle" id="topbar-sub">Complaint analytics and management</div>
+                </div>
+                <div class="topbar-right">
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">☀️</button>
+
+                    <div class="notif-wrapper">
+                        <div class="notif-bell" id="notif-bell">🔔
+                            <span class="notif-count" id="notif-count" style="display:none;"></span>
+                        </div>
+                        <div class="notif-drop" id="notif-drop"></div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-body">
+                <!-- Stats row (always visible) -->
+                <div class="stats-grid" id="stats-grid"></div>
+
+                <!-- SECTION: Dashboard -->
+                <div id="section-dashboard">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;">
+                        <div class="section-card">
+                            <div class="section-card-header">
+                                <h3>🍩 Status Distribution</h3>
+                            </div>
+                            <div class="section-card-body">
+                                <div class="chart-container">
+                                    <canvas id="donut-chart" width="180" height="180"
+                                        style="max-width:180px;max-height:180px;"></canvas>
+                                    <div class="chart-legend" id="chart-legend"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-card">
+                            <div class="section-card-header">
+                                <h3>🏛️ By Department</h3>
+                            </div>
+                            <div class="section-card-body" id="dept-breakdown"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: Forwarded -->
+                <div id="section-forwarded" style="display:none;">
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <h3>📥 Forwarded — Awaiting Resolution</h3>
+                            <span id="fwd-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
+                        </div>
+                        <div class="section-card-body" id="fwd-list"></div>
+                    </div>
+                </div>
+
+                <!-- SECTION: Rejected -->
+                <div id="section-rejected" style="display:none;">
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <h3>❌ Rejected Complaints</h3>
+                            <span id="rej-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
+                        </div>
+                        <div class="section-card-body" id="rej-list"></div>
+                    </div>
+                </div>
+
+                <!-- SECTION: Resolved -->
+                <div id="section-resolved" style="display:none;">
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <h3>✅ Resolved Archive</h3>
+                            <span id="res-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
+                        </div>
+                        <div class="section-card-body" id="res-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolve Modal -->
+    <div class="modal-overlay" id="resolve-modal" style="display:none;"
+        onclick="if(event.target===this)closeResolveModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Mark as Resolved</h2>
+                <p>This will close the complaint lifecycle. The student will be notified.</p>
+            </div>
+            <div id="res-preview"
+                style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:1.5rem;color:var(--text-muted);">
+            </div>
+            <button class="btn btn-success btn-lg" onclick="confirmResolve()">🎉 Mark Resolved</button>
+            <button class="btn btn-ghost  btn-lg" style="margin-top:0.5rem;"
+
+                    <div class="notif-wrapper">
+                        <div class="notif-bell" id="notif-bell">🔔
+                            <span class="notif-count" id="notif-count" style="display:none;"></span>
+                        </div>
+                        <div class="notif-drop" id="notif-drop"></div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-body">
+                <!-- Stats row (always visible) -->
+                <div class="stats-grid" id="stats-grid"></div>
+
+                <!-- SECTION: Dashboard -->
+                <div id="section-dashboard">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;">
+                        <div class="section-card">
+                            <div class="section-card-header">
+                                <h3>🍩 Status Distribution</h3>
+                            </div>
+                            <div class="section-card-body">
+                                <div class="chart-container">
+                                    <canvas id="donut-chart" width="180" height="180"
+                                        style="max-width:180px;max-height:180px;"></canvas>
+                                    <div class="chart-legend" id="chart-legend"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-card">
+                            <div class="section-card-header">
+                                <h3>🏛️ By Department</h3>
+                            </div>
+                            <div class="section-card-body" id="dept-breakdown"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: Forwarded -->
+                <div id="section-forwarded" style="display:none;">
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <h3>📥 Forwarded — Awaiting Resolution</h3>
+                            <span id="fwd-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
+                        </div>
+                        <div class="section-card-body" id="fwd-list"></div>
+                    </div>
+                </div>
+
+                <!-- SECTION: Rejected -->
+                <div id="section-rejected" style="display:none;">
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <h3>❌ Rejected Complaints</h3>
+                            <span id="rej-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
+                        </div>
+                        <div class="section-card-body" id="rej-list"></div>
+                    </div>
+                </div>
+
+                <!-- SECTION: Resolved -->
+                <div id="section-resolved" style="display:none;">
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <h3>✅ Resolved Archive</h3>
+                            <span id="res-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
+                        </div>
+                        <div class="section-card-body" id="res-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolve Modal -->
+    <div class="modal-overlay" id="resolve-modal" style="display:none;"
+        onclick="if(event.target===this)closeResolveModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Mark as Resolved</h2>
+                <p>This will close the complaint lifecycle. The student will be notified.</p>
+            </div>
+            <div id="res-preview"
+                style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:1.5rem;color:var(--text-muted);">
+            </div>
+            <button class="btn btn-success btn-lg" onclick="confirmResolve()">🎉 Mark Resolved</button>
+            <button class="btn btn-ghost  btn-lg" style="margin-top:0.5rem;"
+                onclick="closeResolveModal()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="app.js"></script>
+    <script>
+        const session = requireRole('admin');
+        if (session) {
+            document.getElementById('admin-name').textContent = session.name;
+            document.getElementById('admin-role').textContent = session.dept ? `${session.dept} Department` : 'Admin &middot; Full Access';
+        }
+        let donutChart = null;
+        let pendingResolveId = null;
+        let currentSection = 'dashboard';
+
+        const STATUS_COLORS = {
+            pending: { color: '#f59e0b', label: 'Pending' },
+            approved: { color: '#818cf8', label: 'Forwarded' },
+            resolved: { color: '#10b981', label: 'Resolved' },
+            rejected: { color: '#f43f5e', label: 'Rejected' },
+        };
+        const DEPT_COLORS = ['#6366f1', '#f59e0b', '#10b981', '#f43f5e', '#06b6d4'];
+
+        function showSection(name) {
+            currentSection = name;
+            ['dashboard', 'forwarded', 'rejected', 'resolved'].forEach(s => {
+                document.getElementById(`section-${s}`).style.display = s === name ? 'block' : 'none';
+                document.getElementById(`nav-${s === 'forwarded' ? 'forwarded' : s}`).classList.toggle('active', s === name);
+            });
+            const titles = { dashboard: 'Dashboard', forwarded: 'Forwarded Complaints', rejected: 'Rejected Complaints', resolved: 'Resolved Archive' };
+            document.getElementById('topbar-title').textContent = titles[name];
+            renderSection(name);
+        }
+
+        function renderAll() { renderStats(); renderSection(currentSection); }
+
+        async function renderStats() {
+            const all = await getComplaints(session ? session.dept : null);
+            const p = all.filter(c => c.status === 'pending').length,
+                a = all.filter(c => c.status === 'approved').length,
+                r = all.filter(c => c.status === 'resolved').length,
+                x = all.filter(c => c.status === 'rejected').length;
+            const fwdBadge = document.getElementById('nav-fwd-count');
+            fwdBadge.textContent = a; fwdBadge.style.display = a > 0 ? 'inline-block' : 'none';
+            document.getElementById('stats-grid').innerHTML = `
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(245,158,11,0.12);">📋</div>
+        <div class="stat-info"><div class="stat-val" style="color:var(--amber);">${p}</div><div class="stat-lbl">Pending</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(99,102,241,0.12);">📤</div>
+        <div class="stat-info"><div class="stat-val" style="color:var(--indigo-l);">${a}</div><div class="stat-lbl">Forwarded</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(16,185,129,0.12);">✅</div>
+        <div class="stat-info"><div class="stat-val" style="color:var(--emerald);">${r}</div><div class="stat-lbl">Resolved</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(244,63,94,0.12);">❌</div>
+        <div class="stat-info"><div class="stat-val" style="color:#fb7185;">${x}</div><div class="stat-lbl">Rejected</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(255,255,255,0.05);">📊</div>
+        <div class="stat-info"><div class="stat-val" style="color:var(--text-muted);">${all.length}</div><div class="stat-lbl">Total</div></div>
+      </div>`;
+        }
+
+        function renderSection(name) {
+            if (name === 'dashboard') { renderDonut(); renderDeptBreakdown(); }
+            if (name === 'forwarded') renderForwarded();
+            if (name === 'rejected') renderRejected();
+            if (name === 'resolved') renderResolved();
+        }
+
+        async function renderDonut() {
+            const all = await getComplaints(session ? session.dept : null);
+            const counts = { pending: 0, approved: 0, resolved: 0, rejected: 0 };
+            all.forEach(c => { if (counts[c.status] !== undefined) counts[c.status]++; });
+            const labels = Object.keys(counts).map(k => STATUS_COLORS[k].label);
+            const data = Object.values(counts);
+            const colors = Object.keys(counts).map(k => STATUS_COLORS[k].color);
+            const total = data.reduce((a, b) => a + b, 0);
+            document.getElementById('chart-legend').innerHTML = Object.keys(counts).map(k => `
+      <div class="legend-item">
+        <div class="legend-dot" style="background:${STATUS_COLORS[k].color};"></div>
+        <span style="color:var(--text-muted);">${STATUS_COLORS[k].label}:</span> <strong>${counts[k]}</strong>
+      </div>`).join('');
+            const ctx = document.getElementById('donut-chart').getContext('2d');
+            if (donutChart) donutChart.destroy();
+            donutChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels, datasets: [{ data: total === 0 ? [1, 0, 0, 0] : data, backgroundColor: total === 0 ? ['rgba(255,255,255,0.05)'] : colors, borderColor: '#141d35', borderWidth: 3, hoverOffset: 6 }] },
+                options: { cutout: '68%', plugins: { legend: { display: false }, tooltip: { enabled: total > 0, callbacks: { label: (c) => ` ${c.label}: ${c.raw}${total > 0 ? ` (${Math.round(c.raw / total * 100)}%)` : ''}` } } }, animation: { animateRotate: true, duration: 700 } }
+            });
+        }
+
+        async function renderDeptBreakdown() {
+            const all = await getComplaints(session ? session.dept : null);
+            const depts = {};
+            all.forEach(c => { depts[c.department] = (depts[c.department] || 0) + 1; });
+            const sorted = Object.entries(depts).sort((a, b) => b[1] - a[1]);
+            const total = all.length || 1;
+            const el = document.getElementById('dept-breakdown');
+            if (!sorted.length) { el.innerHTML = `<div class="empty-state"><div class="ei">📊</div><p>No data yet</p></div>`; return; }
+            el.innerHTML = sorted.map(([dept, count], i) => `
+      <div class="dept-bar-row">
+        <div class="dept-bar-top">
+          <span class="badge ${deptBadgeClass(dept)}">${dept}</span>
+          <span style="color:var(--text-muted);font-size:0.78rem;">${count} complaint${count !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="dept-bar-track">
+          <div class="dept-bar-fill" style="width:${Math.round(count / total * 100)}%;background:${DEPT_COLORS[i % DEPT_COLORS.length]};"></div>
+        </div>
+      </div>`).join('');
+        }
+
+        async function renderForwarded() {
+            const fwd = (await getComplaints(session.dept)).filter(c => c.status === 'approved').sort((a, b) => (b.votes || []).length - (a.votes || []).length);
+            document.getElementById('fwd-count').textContent = `${fwd.length} complaint${fwd.length !== 1 ? 's' : ''}`;
+            const el = document.getElementById('fwd-list');
+            if (!fwd.length) { el.innerHTML = `<div class="empty-state"><div class="ei">📭</div><p>No forwarded complaints awaiting resolution.</p></div>`; return; }
+            const me = session ? session.name : 'Management';
+            el.innerHTML = fwd.map(c => {
+                const votes = c.votes || [];
+                const sla = getSLAInfo(c.createdAt);
+                return `
+      <div class="complaint-row${sla.overdue ? ' overdue' : ''}">
+        <div class="row-meta">
+          <span class="badge ${deptBadgeClass(c.department)}">${c.department}</span>
+          <span class="badge badge-approved">Forwarded</span>
+          ${votes.length > 1 ? `<span class="badge badge-votes">👥 ${votes.length} students</span>` : ''}
+          <span class="badge ${slaBadgeClass(sla.colorClass)}">⏱ ${sla.label}</span>
+        </div>
+        <div class="row-text">${escHtml(c.text)}</div>
+        ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;">📸 View Evidence</a></div>` : ''}
+        ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;">📍 View Location Map</a></div>` : ''}
+        ${votes.length > 1 ? `<div class="voters-text">Reported by: ${votes.map(v => escHtml(v)).join(', ')}</div>` : ''}
+        <div class="row-footer">
+          <div class="row-meta-info">
+            <span>By ${c.authorName === 'Anonymous' ? '🕵️ Anon' : escHtml(c.authorName || 'Student')}</span>
+            <span>·</span><span>Submitted ${formatTime(c.createdAt)}</span>
+            ${c.approvedAt ? `<span>· Forwarded ${formatTime(c.approvedAt)}</span>` : ''}
+          </div>
+          <button class="btn btn-sm btn-resolve" onclick="openResolveModal(${c.id})">🎉 Mark Resolved</button>
+        </div>
+        ${renderCommentThread(c, 'admin', me)}
+      </div>`;
+            }).join('');
+        }
+
+        async function renderRejected() {
+            const rej = (await getComplaints(session.dept)).filter(c => c.status === 'rejected').reverse();
+            document.getElementById('rej-count').textContent = `${rej.length} complaint${rej.length !== 1 ? 's' : ''}`;
+            const el = document.getElementById('rej-list');
+            if (!rej.length) { el.innerHTML = `<div class="empty-state"><div class="ei">📭</div><p>No rejected complaints.</p></div>`; return; }
+            el.innerHTML = rej.map(c => `
+      <div class="complaint-row">
+        <div class="row-meta">
+          <span class="badge ${deptBadgeClass(c.department)}">${c.department}</span>
+          <span class="badge badge-rejected">Rejected</span>
+        </div>
+        <div class="row-text">${escHtml(c.text)}</div>
+        ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;">📸 View Evidence</a></div>` : ''}
+        ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;">📍 View Location Map</a></div>` : ''}
+        ${c.rejectionReason ? `<div class="rejection-box">Reason: ${escHtml(c.rejectionReason)}</div>` : ''}
+        <div class="row-footer">
+          <div class="row-meta-info">
+            <span>By ${c.authorName === 'Anonymous' ? '🕵️ Anon' : escHtml(c.authorName || 'Student')}</span>
+            <span>·</span><span>Submitted ${formatTime(c.createdAt)}</span>
+            ${c.rejectedAt ? `<span>· Rejected ${formatTime(c.rejectedAt)}</span>` : ''}
+          </div>
+        </div>
+        ${renderCommentThread(c, null, null)}
+      </div>`).join('');
+        }
+
+        async function renderResolved() {
+            const res = (await getComplaints(session.dept)).filter(c => c.status === 'resolved').reverse();
+            document.getElementById('res-count').textContent = `${res.length} complaint${res.length !== 1 ? 's' : ''}`;
+            const el = document.getElementById('res-list');
+            if (!res.length) { el.innerHTML = `<div class="empty-state"><div class="ei">🎯</div><p>No resolved complaints yet.</p></div>`; return; }
+            el.innerHTML = res.map(c => `
+      <div class="complaint-row">
+        <div class="row-meta">
+          <span class="badge ${deptBadgeClass(c.department)}">${c.department}</span>
+          <span class="badge badge-resolved">Resolved</span>
+          ${(c.votes || []).length > 1 ? `<span class="badge badge-votes">👥 ${c.votes.length} students</span>` : ''}
+        </div>
+        <div class="row-text">${escHtml(c.text)}</div>
+        ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;">📸 View Evidence</a></div>` : ''}
+        ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;">📍 View Location Map</a></div>` : ''}
+        <div class="row-footer">
+          <div class="row-meta-info">
+            <span>By ${c.authorName === 'Anonymous' ? '🕵️ Anon' : escHtml(c.authorName || 'Student')}</span>
+            <span>·</span><span>Submitted ${formatTime(c.createdAt)}</span>
+            ${c.resolvedAt ? `<span>· Resolved ${formatTime(c.resolvedAt)}</span>` : ''}
+          </div>
+        </div>
+        ${renderCommentThread(c, null, null)}
+      </div>`).join('');
+        }
+
+        // Comment submit (called from thread HTML)
+        async function submitComment(cid, authorName, role) {
+            const input = document.getElementById(`comment-input-${cid}`);
+            if (!input || !input.value.trim()) return;
+            await addComment(cid, authorName, role, input.value.trim());
+            const __all = await getComplaints(session ? session.dept : null);
+            const c = __all.find(x => x.id === cid);
+            await addNotification('student', `Management replied on your ${c.department} complaint: "${input.value.trim().substring(0, 60)}"`, 'info', '💬');
+            showToast('Note added.', 'success');
+            renderSection(currentSection);
+        }
+
+        async function openResolveModal(id) {
+            pendingResolveId = id;
+            const __all = await getComplaints(session ? session.dept : null);
+            const c = __all.find(x => x.id === id);
+            document.getElementById('res-preview').innerHTML = `<strong>${escHtml(c.department)}</strong> — ${escHtml(c.text.substring(0, 200))}`;
+            document.getElementById('resolve-modal').style.display = 'flex';
+        }
+        function closeResolveModal() { document.getElementById('resolve-modal').style.display = 'none'; pendingResolveId = null; }
+        async function confirmResolve() {
+            await updateComplaintStatus(pendingResolveId, 'resolved');
+            const __all = await getComplaints(session ? session.dept : null);
+            const c = __all.find(x => x.id === pendingResolveId);
+            await addNotification('student', `Your ${c.department} complaint has been resolved. 🎉`, 'success', '🎉');
+            showToast('Complaint resolved!', 'success');
+            closeResolveModal(); renderAll();
+        }
+
+        function deptBadgeClass(d) { return { Canteen: 'badge-dept-canteen', Academics: 'badge-dept-academics', Hostel: 'badge-dept-hostel', 'Library & Sports': 'badge-dept-library-sports', Security: 'badge-dept-security', Transportation: 'badge-dept-transportation', Infrastructure: 'badge-dept-infrastructure', Cleanliness: 'badge-dept-cleanliness' }[d] || ''; }
+        function slaBadgeClass(c) { return { 'sla-ok': 'badge-sla-ok', 'sla-warn': 'badge-sla-warn', 'sla-over': 'badge-sla-over' }[c] || 'badge-sla-ok'; }
+
+        initNotificationBell('admin');
+        renderAll();
+    </script>
+</body>
+
+</html>

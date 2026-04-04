@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Portal — DTM</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <nav class="student-navbar">
+        <div class="brand">
+            <div class="logo-mark">🏫</div>
+            <span>DTM Portal <span style="color:var(--text-faint);font-weight:400;">/ Student</span></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">☀️</button>
+
+            <div class="notif-wrapper">
+                <div class="notif-bell" id="notif-bell">🔔
+                    <span class="notif-count" id="notif-count" style="display:none;"></span>
+                </div>
+                <div class="notif-drop" id="notif-drop"></div>
+            </div>
+            <span style="font-size:0.78rem;color:var(--text-muted);" id="user-label"></span>
+            <button class="btn btn-sm btn-ghost" onclick="logout()">Sign Out</button>
+        </div>
+    </nav>
+
+    <div class="student-layout">
+        <!-- Submit Form -->
+        <div class="submit-card">
+            <h3>📝 Submit a Complaint</h3>
+            <div class="field">
+                <label>Department</label>
+                <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 0.5rem 0;">Choose the department most relevant to your issue.</p>
+                <select id="dept-select" onchange="onDeptChange()">
+                    <option value="">— Select department —</option>
+                    <option value="Canteen">🍽️ Canteen</option>
+                    <option value="Academics">📚 Academics</option>
+                    <option value="Hostel">🏠 Hostel</option>
+                    <option value="Library & Sports">📖⚽ Library & Sports</option>
+                    <option value="Security">🛡️ Security</option>
+                    <option value="Transportation">🚌 Transportation</option>
+                    <option value="Infrastructure">🏗️ Infrastructure</option>
+                    <option value="Cleanliness">🧹 Cleanliness</option>
+                </select>
+            </div>
+            
+            <div class="field" id="sub-problem-section" style="display: none;">
+                <label>Sub-Problem</label>
+                <select id="sub-problem-select">
+
+            <div class="notif-wrapper">
+                <div class="notif-bell" id="notif-bell">🔔
+                    <span class="notif-count" id="notif-count" style="display:none;"></span>
+                </div>
+                <div class="notif-drop" id="notif-drop"></div>
+            </div>
+            <span style="font-size:0.78rem;color:var(--text-muted);" id="user-label"></span>
+            <button class="btn btn-sm btn-ghost" onclick="logout()">Sign Out</button>
+        </div>
+    </nav>
+
+    <div class="student-layout">
+        <!-- Submit Form -->
+        <div class="submit-card">
+            <h3>📝 Submit a Complaint</h3>
+            <div class="field">
+                <label>Department</label>
+                <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 0.5rem 0;">Choose the department most relevant to your issue.</p>
+                <select id="dept-select" onchange="onDeptChange()">
+                    <option value="">— Select department —</option>
+                    <option value="Canteen">🍽️ Canteen</option>
+                    <option value="Academics">📚 Academics</option>
+                    <option value="Hostel">🏠 Hostel</option>
+                    <option value="Library & Sports">📖⚽ Library & Sports</option>
+                    <option value="Security">🛡️ Security</option>
+                    <option value="Transportation">🚌 Transportation</option>
+                    <option value="Infrastructure">🏗️ Infrastructure</option>
+                    <option value="Cleanliness">🧹 Cleanliness</option>
+                </select>
+            </div>
+            
+            <div class="field" id="sub-problem-section" style="display: none;">
+                <label>Sub-Problem</label>
+                <select id="sub-problem-select">
+                    <option value="">— Select sub-problem —</option>
+                </select>
+            </div>
+
+            <div id="dup-area"></div>
+            <div id="new-form-section">
+                <div class="field">
+                    <label>Complaint Details</label>
+                    <textarea id="complaint-text" placeholder="Describe your issue clearly and in detail…"></textarea>
+                    
+                    <div style="margin-top:0.75rem;">
+                        <label style="font-size:0.8rem;">Attach Evidence (Optional)</label>
+                        <br/>
+                        <input type="file" id="comp-image" accept="image/*" style="margin-top:0.25rem; font-size:0.8rem;"/>
+                    </div>
+                    <div style="margin-top:0.75rem;">
+                        <label style="font-size:0.8rem;">Geolocation (Optional)</label>
+                        <br/>
+                        <button class="btn btn-sm btn-ghost" style="margin-top:0.25rem; border:1px solid var(--border);" onclick="getGeoLocation(event)">📍 Capture Current Location</button>
+                        <div id="geo-status" style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;"></div>
+                        <input type="hidden" id="geo-tag" value="" />
+                    </div>
+
+                    <label class="anon-check" style="margin-top:0.75rem;"><input type="checkbox" id="anon-checkbox"> Submit anonymously</label>
+                </div>
+                <p class="err-msg" id="form-err"></p>
+                <button class="btn btn-primary btn-sm" onclick="submitComplaint()">Submit Complaint →</button>
+            </div>
+        </div>
+
+        <!-- My Submissions -->
+        <div class="section-card">
+            <div class="section-card-header">
+                <h3>📋 My Submissions</h3>
+                <span id="sub-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
+            </div>
+            <div class="section-card-body" id="submissions-list">
+                <div class="empty-state">
+                    <div class="ei">📭</div>
+                    <p>No complaints submitted yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="app.js"></script>
+    <script>
+        const session = requireRole('student');
+        if (session) document.getElementById('user-label').textContent = session.name;
+
+        function deptBadgeClass(d) {
+            return { Canteen: 'badge-dept-canteen', Academics: 'badge-dept-academics', Hostel: 'badge-dept-hostel', 'Library & Sports': 'badge-dept-library-sports', Security: 'badge-dept-security', Transportation: 'badge-dept-transportation', Infrastructure: 'badge-dept-infrastructure', Cleanliness: 'badge-dept-cleanliness' }[d] || '';
+        }
+        function statusBadgeClass(s) { return `badge-${s}`; }
+        function slaBadgeClass(c) { return `badge-sla-${c}`; }
+
+        async function onDeptChange() {
+            const dept = document.getElementById('dept-select').value;
+            const subProblemSec = document.getElementById('sub-problem-section');
+            const subProblemSelect = document.getElementById('sub-problem-select');
+            const dupArea = document.getElementById('dup-area');
+            const newSec = document.getElementById('new-form-section');
+            document.getElementById('form-err').style.display = 'none';
+
+            // Handle Sub-Problem dropdown
+            if (dept && SUB_PROBLEMS[dept]) {
+                subProblemSelect.innerHTML = '<option value="">— Select sub-problem —</option>' + 
+                    SUB_PROBLEMS[dept].map(sp => `<option value="${sp}">${sp}</option>`).join('');
+                subProblemSec.style.display = 'block';
+            } else {
+                subProblemSec.style.display = 'none';
+                subProblemSelect.value = '';
+            }
+
+            if (!dept) { dupArea.innerHTML = ''; newSec.style.display = 'block'; return; }
+            const existing = await findSimilarOpenComplaint(dept);
+            if (!existing) { dupArea.innerHTML = ''; newSec.style.display = 'block'; return; }
+            const votes = existing.votes || [];
+            const myName = (session ? session.name : 'Student');
+            const voted = votes.includes(myName);
+            dupArea.innerHTML = `
+        <div class="dup-banner">
+          <div class="dup-banner-title">⚠️ Similar Issue Already Reported</div>
+          <div class="dup-banner-body">
+            A <strong>${dept}</strong> complaint is already <strong>${statusLabel(existing.status)}</strong>.
+            ${votes.length > 1 ? `<strong>${votes.length} students</strong> have already reported this.` : ''}
+            Upvote to avoid duplicates and keep review queue clean.
+          </div>
+          <div class="dup-existing">"${escHtml(existing.text.substring(0, 160))}${existing.text.length > 160 ? '…' : ''}"</div>
+          <div class="dup-actions">
+            ${voted
+                    ? `<button class="btn btn-sm" style="opacity:0.5;cursor:not-allowed;border:1px solid var(--border);color:var(--text-muted);" disabled>👍 Already Supported (${votes.length})</button>`
+                    : `<button class="btn btn-sm btn-approve" onclick="doUpvote(${existing.id})">👍 I have this issue too · ${votes.length} report${votes.length !== 1 ? 's' : ''}</button>`}
+            <button class="btn btn-sm btn-ghost" onclick="showNewForm()">My issue is different →</button>
+          </div>
+        </div>`;
+            newSec.style.display = 'none';
+        }
+
+        async function doUpvote(id) {
+            await upvoteComplaint(id, (session ? session.name : 'Student'));
+            showToast('Your support added to existing complaint.', 'success', '👍');
+            document.getElementById('dept-select').value = '';
+            document.getElementById('dup-area').innerHTML = '';
+            document.getElementById('new-form-section').style.display = 'block';
+            renderSubmissions();
+        }
+        function showNewForm() {
+            document.getElementById('new-form-section').style.display = 'block';
+            document.getElementById('complaint-text').focus();
+        }
+        async function submitComplaint() {
+            const dept = document.getElementById('dept-select').value;
+            const subProblem = document.getElementById('sub-problem-select').value;
+            const text = document.getElementById('complaint-text').value.trim();
+            const err = document.getElementById('form-err');
+            err.style.display = 'none';
+            if (!dept) { err.textContent = 'Please select a department.'; err.style.display = 'block'; return; }
+            if (SUB_PROBLEMS[dept] && !subProblem) { err.textContent = 'Please select a sub-problem.'; err.style.display = 'block'; return; }
+            if (text.length < 10) { err.textContent = 'Complaint must be at least 10 characters.'; err.style.display = 'block'; return; }
+            
+            const isAnon = document.getElementById('anon-checkbox') && document.getElementById('anon-checkbox').checked;
+            const author = isAnon ? 'Anonymous' : ((session ? session.name : 'Student'));
+            
+            const imgInput = document.getElementById('comp-image');
+            const imageFile = imgInput && imgInput.files.length > 0 ? imgInput.files[0] : null;
+            const geoInput = document.getElementById('geo-tag');
+            const geotag = geoInput ? geoInput.value : null;
+
+            await addComplaint(dept, subProblem, text, author, imageFile, geotag);
+
+            document.getElementById('complaint-text').value = '';
+            document.getElementById('dup-area').innerHTML = '';
+            if (document.getElementById('comp-image')) document.getElementById('comp-image').value = '';
+            if (document.getElementById('geo-tag')) document.getElementById('geo-tag').value = '';
+            if (document.getElementById('geo-status')) document.getElementById('geo-status').textContent = '';
+            
+            showToast('Complaint submitted successfully.', 'success');
+            renderSubmissions();
+        }
+
+        function getGeoLocation(e) {
+            e.preventDefault();
+            const statusEl = document.getElementById('geo-status');
+            const inputEl = document.getElementById('geo-tag');
+            statusEl.textContent = 'Locating...';
+            if (!navigator.geolocation) {
+                statusEl.textContent = 'Geolocation not supported by your browser.';
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const tag = `${pos.coords.latitude},${pos.coords.longitude}`;
+                    inputEl.value = tag;
+                    statusEl.textContent = `✅ Location captured: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+                },
+                (err) => {
+                    statusEl.textContent = `❌ Error: ${err.message}`;
+                }
+            );
+        }
+
+        async function renderSubmissions() {
+            const list = document.getElementById('submissions-list');
+            const all = await getComplaints();
+            document.getElementById('sub-count').textContent = `${all.length} submission${all.length !== 1 ? 's' : ''}`;
+            if (!all.length) { list.innerHTML = `<div class="empty-state"><div class="ei">📭</div><p>No complaints submitted yet.</p></div>`; return; }
+            list.innerHTML = [...all].reverse().map(c => {
+                const sla = getSLAInfo(c.createdAt);
+                const votes = c.votes || [];
+                return `
+        <div class="complaint-row${sla.overdue && c.status === 'pending' ? ' overdue' : ''}">
+          <div class="row-meta">
+            <span class="badge ${deptBadgeClass(c.department)}">${c.department}</span>
+            <span class="badge ${statusBadgeClass(c.status)}">${statusLabel(c.status)}</span>
+            ${votes.length > 1 ? `<span class="badge badge-votes">👥 ${votes.length} students</span>` : ''}
+            <span class="badge ${slaBadgeClass(sla.colorClass.replace('sla-', ''))}">⏱ ${sla.label}</span>
+          </div>
+          ${c.subProblem ? `<div style="font-size:0.75rem;font-weight:600;color:var(--text-muted);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">↳ ${c.subProblem}</div>` : ''}
+          <div class="row-text">${escHtml(c.text)}</div>
+          ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;">📸 View Evidence</a></div>` : ''}
+          ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;">📍 View Location Map</a></div>` : ''}
+          ${c.status === 'rejected' && c.rejectionReason ? `<div class="rejection-box">❌ <strong>Rejected:</strong> ${escHtml(c.rejectionReason)}</div>` : ''}
+          <div class="row-footer">
+            <div class="row-meta-info">
+              <span>Submitted ${formatTime(c.createdAt)}</span>
+              ${c.resolvedAt ? `<span>· Resolved ${formatTime(c.resolvedAt)}</span>` : ''}
+            </div>
+          </div>
+          ${renderCommentThread(c, null, null)}
+        </div>`;
+            }).join('');
+        }
+        function statusLabel(s) { return { pending: 'Pending', approved: 'Forwarded', resolved: 'Resolved', rejected: 'Rejected' }[s] || s; }
+
+        initNotificationBell('student');
+        renderSubmissions();
+    </script>
+</body>
+
+</html>

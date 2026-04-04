@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DTM — Complaint Management Portal</title>
+  <meta name="description"
+    content="DTM College complaint management portal. Login as Student, Authenticator or Management." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div class="login-page">
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">☀️</button>
+    <div class="login-logo">
+      <div class="logo-mark">🏫</div>
+      <span>DTM Portal</span>
+    </div>
+    <p class="login-tagline">Complaint Management System · Select your role to continue</p>
+
+    <div class="login-cards">
+      <div class="login-card student" onclick="openLogin('student')">
+        <div class="lc-top">
+          <div class="lc-icon">🎓</div>
+          <span class="lc-arrow">→</span>
+        </div>
+        <h3>Student Portal</h3>
+        <p>Submit and track complaints across campus departments.</p>
+        <div class="lc-creds">
+          <div>Email: <code>student@srmist.edu.in</code></div>
+          <div>Password: <code>student123</code></div>
+        </div>
+      </div>
+
+      <div class="login-card auth" onclick="openLogin('authenticator')">
+        <div class="lc-top">
+          <div class="lc-icon">🔍</div>
+          <span class="lc-arrow">→</span>
+        </div>
+        <h3>Authenticator</h3>
+        <p>Review, verify and forward or reject student complaints.</p>
+        <div class="lc-creds">
+          <div>Email: <code>auth@srmist.edu.in</code></div>
+          <div>Password: <code>auth123</code></div>
+        </div>
+      </div>
+
+      <div class="login-card admin" onclick="openLogin('admin')">
+        <div class="lc-top">
+          <div class="lc-icon">📊</div>
+          <span class="lc-arrow">→</span>
+        </div>
+        <h3>Management</h3>
+        <p>Monitor analytics for your department and resolve complaints.</p>
+        <div class="lc-creds">
+          <div>Email: <code>canteen@srmist.edu.in</code></div>
+          <div>(Or other admin emails ending in @srmist.edu.in)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal-overlay" id="login-modal" style="display:none;" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-title">Sign In</h2>
+        <p id="modal-sub">Enter your credentials to continue</p>
+      </div>
+      <div class="field">
+        <label>College Email</label>
+        <input type="email" id="inp-user" placeholder="name@srmist.edu.in" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="inp-pass" placeholder="Enter password" autocomplete="current-password"
+          onkeydown="if(event.key==='Enter')doAuth()" />
+      </div>
+      <p class="err-msg" id="login-err">Invalid email or password.</p>
+      <button class="btn btn-primary btn-lg" id="btn-submit" style="margin-top:0.25rem;" onclick="doAuth()">Sign In →</button>
+      <div style="text-align:center; margin-top:0.75rem; font-size:0.85rem;">
+        <a href="#" id="toggle-auth" onclick="toggleAuthMode(); return false;" style="color:var(--indigo-l); text-decoration:none;">Don't have an account? Sign Up</a>
+      </div>
+      <button class="btn btn-ghost btn-lg" style="margin-top:0.5rem;" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="app.js"></script>
+  <script>
+    // Redirect if already logged in
+    const s = getSession();
+    if (s) { const pages = { student: 'student.html', authenticator: 'authenticator.html', admin: 'admin.html' }; window.location.href = pages[s.role]; }
+
+    let currentRole = null;
+    let authMode = 'login';
+    const roleLabels = { student: '🎓 Student', authenticator: '🔍 Authenticator', admin: '📊 Management' };
+
+    function toggleAuthMode() {
+      authMode = authMode === 'login' ? 'register' : 'login';
+      document.getElementById('modal-title').textContent = roleLabels[currentRole] + (authMode === 'login' ? ' Sign In' : ' Sign Up');
+      document.getElementById('btn-submit').innerHTML = authMode === 'login' ? 'Sign In →' : 'Create Account →';
+      document.getElementById('toggle-auth').textContent = authMode === 'login' ? "Don't have an account? Sign Up" : "Already have an account? Sign In";
+      document.getElementById('login-err').style.display = 'none';
+      document.getElementById('inp-pass').value = '';
+      setTimeout(() => document.getElementById('inp-user').focus(), 50);
+    }
+
+    async function openLogin(role) {
+      currentRole = role;
+      authMode = 'login';
+      document.getElementById('modal-title').textContent = roleLabels[role] + ' Sign In';
+      document.getElementById('btn-submit').innerHTML = 'Sign In →';
+      document.getElementById('toggle-auth').textContent = "Don't have an account? Sign Up";
+      document.getElementById('inp-user').value = '';
+      document.getElementById('inp-pass').value = '';
+      document.getElementById('login-err').style.display = 'none';
+      document.getElementById('login-modal').style.display = 'flex';
+      setTimeout(() => document.getElementById('inp-user').focus(), 80);
+    }
+    
+    function closeModal() { document.getElementById('login-modal').style.display = 'none'; currentRole = null; }
+
+    async function doAuth() {
+      const user = document.getElementById('inp-user').value.trim().toLowerCase();
+      const pass = document.getElementById('inp-pass').value;
+      const errEl = document.getElementById('login-err');
+      errEl.style.display = 'none';
+      
+      const endpoint = authMode === 'login' ? '/api/login' : '/api/register';
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pass, role: currentRole })
+        });
+        
+        let data;
+        try { data = await res.json(); } catch(e) {}
+        
+        if (!res.ok) { 
+          errEl.textContent = data ? data.error : 'Invalid email or password.';
+          errEl.style.display = 'block'; 
+          return; 
+        }
+        
+        setSession(data.role || currentRole, data.name || user, data.department);
+        showToast(authMode === 'login' ? 'Welcome back!' : 'Account created successfully!', 'success');
+        const pages = { student: 'student.html', authenticator: 'authenticator.html', admin: 'admin.html' };
+        setTimeout(() => window.location.href = pages[data.role || currentRole], 500);
+      } catch (err) {
+        errEl.textContent = 'Server connection failed.';
+        errEl.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+
+</html>

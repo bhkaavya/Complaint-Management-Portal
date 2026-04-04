@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authenticator — DTM Portal</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <div class="app-shell">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-mark">🏫</div>
+                <div class="brand">DTM Portal<span>Authenticator View</span></div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Queue</div>
+                <button class="nav-item amber active" id="nav-pending" onclick="switchTab('pending')">
+                    <span class="nav-icon">⏳</span> Pending
+                    <span class="nav-badge" id="nav-pending-count"></span>
+                </button>
+                <button class="nav-item" id="nav-approved" onclick="switchTab('approved')">
+                    <span class="nav-icon">✅</span> Forwarded
+                </button>
+                <button class="nav-item rose" id="nav-rejected" onclick="switchTab('rejected')">
+                    <span class="nav-icon">❌</span> Rejected
+                </button>
+                <button class="nav-item emerald" id="nav-resolved" onclick="switchTab('resolved')">
+                    <span class="nav-icon">🎉</span> Resolved
+                </button>
+            </nav>
+
+            <div class="sidebar-user">
+                <div class="user-avatar" style="background:rgba(245,158,11,0.15);color:#fcd34d;">A</div>
+                <div class="user-meta">
+                    <div class="user-name">Authenticator</div>
+                    <div class="user-role">Complaint Reviewer</div>
+                </div>
+                <button class="btn-sidebar-logout" onclick="logout()" title="Sign out">✕</button>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="main-content">
+            <header class="topbar">
+                <div>
+                    <div class="topbar-title" id="topbar-title">Pending Complaints</div>
+                    <div class="topbar-subtitle" id="topbar-sub">Review and action each complaint below</div>
+                </div>
+                <div class="topbar-right">
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">☀️</button>
+
+                    <div class="notif-wrapper">
+                        <div class="notif-bell" id="notif-bell">🔔
+                            <span class="notif-count" id="notif-count" style="display:none;"></span>
+                        </div>
+                        <div class="notif-drop" id="notif-drop"></div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-body">
+                <!-- Stats -->
+                <div class="stats-grid" id="stats-grid"></div>
+
+                <!-- Complaint List -->
+                <div class="section-card">
+                    <div style="border-bottom:1px solid var(--border);">
+                        <div class="tabs-bar" id="tabs-bar">
+                            <button class="tab-btn active" id="tab-pending" onclick="switchTab('pending')">⏳
+                                Pending</button>
+                            <button class="tab-btn" id="tab-approved" onclick="switchTab('approved')">✅
+                                Forwarded</button>
+                            <button class="tab-btn" id="tab-rejected" onclick="switchTab('rejected')">❌
+                                Rejected</button>
+                            <button class="tab-btn" id="tab-resolved" onclick="switchTab('resolved')">🎉
+                                Resolved</button>
+                        </div>
+                    </div>
+                    <div class="section-card-body" id="complaints-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approve Modal -->
+    <div class="modal-overlay" id="approve-modal" style="display:none;"
+        onclick="if(event.target===this)closeModal('approve-modal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Approve & Forward</h2>
+                <p>This complaint will be verified and sent to Management for resolution.</p>
+            </div>
+            <div id="approve-preview"
+                style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:1.5rem;color:var(--text-muted);">
+            </div>
+            <button class="btn btn-primary btn-lg" onclick="confirmApprove()">✅ Approve & Forward</button>
+            <button class="btn btn-ghost  btn-lg" style="margin-top:0.5rem;"
+                onclick="closeModal('approve-modal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div class="modal-overlay" id="reject-modal" style="display:none;"
+        onclick="if(event.target===this)closeModal('reject-modal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Reject Complaint</h2>
+                <p>Provide a clear reason so the student understands the decision.</p>
+            </div>
+            <div id="reject-preview"
+                style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:1rem;color:var(--text-muted);">
+            </div>
+            <div class="field">
+                <label>Rejection Reason *</label>
+                <textarea id="reject-reason" placeholder="e.g. Duplicate issue, Out of scope, Insufficient details…"
+                    style="min-height:80px;"></textarea>
+            </div>
+            <p class="err-msg" id="reject-err">Please provide a reason before rejecting.</p>
+
+                    <div class="notif-wrapper">
+                        <div class="notif-bell" id="notif-bell">🔔
+                            <span class="notif-count" id="notif-count" style="display:none;"></span>
+                        </div>
+                        <div class="notif-drop" id="notif-drop"></div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-body">
+                <!-- Stats -->
+                <div class="stats-grid" id="stats-grid"></div>
+
+                <!-- Complaint List -->
+                <div class="section-card">
+                    <div style="border-bottom:1px solid var(--border);">
+                        <div class="tabs-bar" id="tabs-bar">
+                            <button class="tab-btn active" id="tab-pending" onclick="switchTab('pending')">⏳
+                                Pending</button>
+                            <button class="tab-btn" id="tab-approved" onclick="switchTab('approved')">✅
+                                Forwarded</button>
+                            <button class="tab-btn" id="tab-rejected" onclick="switchTab('rejected')">❌
+                                Rejected</button>
+                            <button class="tab-btn" id="tab-resolved" onclick="switchTab('resolved')">🎉
+                                Resolved</button>
+                        </div>
+                    </div>
+                    <div class="section-card-body" id="complaints-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approve Modal -->
+    <div class="modal-overlay" id="approve-modal" style="display:none;"
+        onclick="if(event.target===this)closeModal('approve-modal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Approve & Forward</h2>
+                <p>This complaint will be verified and sent to Management for resolution.</p>
+            </div>
+            <div id="approve-preview"
+                style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:1.5rem;color:var(--text-muted);">
+            </div>
+            <button class="btn btn-primary btn-lg" onclick="confirmApprove()">✅ Approve & Forward</button>
+            <button class="btn btn-ghost  btn-lg" style="margin-top:0.5rem;"
+                onclick="closeModal('approve-modal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div class="modal-overlay" id="reject-modal" style="display:none;"
+        onclick="if(event.target===this)closeModal('reject-modal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Reject Complaint</h2>
+                <p>Provide a clear reason so the student understands the decision.</p>
+            </div>
+            <div id="reject-preview"
+                style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:1rem;color:var(--text-muted);">
+            </div>
+            <div class="field">
+                <label>Rejection Reason *</label>
+                <textarea id="reject-reason" placeholder="e.g. Duplicate issue, Out of scope, Insufficient details…"
+                    style="min-height:80px;"></textarea>
+            </div>
+            <p class="err-msg" id="reject-err">Please provide a reason before rejecting.</p>
+            <button class="btn btn-danger btn-lg" onclick="confirmReject()">❌ Reject Complaint</button>
+            <button class="btn btn-ghost btn-lg" style="margin-top:0.5rem;"
+                onclick="closeModal('reject-modal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>    <script>
+        const session = requireRole('authenticator');
+        let currentTab = 'pending';
+        let pendingApproveId = null;
+        let pendingRejectId = null;
+
+        function switchTab(tab) {
+            currentTab = tab;
+            ['pending', 'approved', 'rejected', 'resolved'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+                document.getElementById(`nav-${t}`).classList.toggle('active', t === tab);
+            });
+            const titles = { pending: 'Pending Complaints', approved: 'Forwarded Complaints', rejected: 'Rejected Complaints', resolved: 'Resolved Complaints' };
+            document.getElementById('topbar-title').textContent = titles[tab];
+            renderList();
+        }
+
+        async function renderStats() {
+            const all = await getComplaints();
+            const p = all.filter(c => c.status === 'pending').length,
+                a = all.filter(c => c.status === 'approved').length,
+                r = all.filter(c => c.status === 'rejected').length,
+                d = all.filter(c => c.status === 'resolved').length;
+            // Update nav badge
+            const pBadge = document.getElementById('nav-pending-count');
+            pBadge.textContent = p; pBadge.style.display = p > 0 ? 'inline-block' : 'none';
+
+            document.getElementById('stats-grid').innerHTML = `
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(245,158,11,0.12);">⏳</div>
+        <div class="stat-info"><div class="stat-val" style="color:var(--amber);">${p}</div><div class="stat-lbl">Awaiting Review</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(99,102,241,0.12);">📤</div>
+        <div class="stat-info"><div class="stat-val" style="color:var(--indigo-l);">${a}</div><div class="stat-lbl">Forwarded</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(244,63,94,0.12);">❌</div>
+        <div class="stat-info"><div class="stat-val" style="color:#fb7185;">${r}</div><div class="stat-lbl">Rejected</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(16,185,129,0.12);">🎉</div>
+        <div class="stat-info"><div class="stat-val" style="color:var(--emerald);">${d}</div><div class="stat-lbl">Resolved</div></div>
+      </div>`;
+        }
+
+        async function renderList() {
+            const all = await getComplaints();
+            const filtered = all.filter(c => c.status === currentTab)
+                .sort((a, b) => (b.votes || []).length - (a.votes || []).length);
+            const listEl = document.getElementById('complaints-list');
+
+            if (!filtered.length) {
+                const msgs = { pending: 'All caught up — no pending complaints.', approved: 'No forwarded complaints.', rejected: 'No rejected complaints.', resolved: 'No resolved complaints yet.' };
+                listEl.innerHTML = `<div class="empty-state"><div class="ei">${currentTab === 'pending' ? '✅' : '📭'}</div><p>${msgs[currentTab]}</p></div>`;
+                return;
+            }
+
+            const me = session ? session.name : 'Authenticator';
+            listEl.innerHTML = filtered.map(c => {
+                const votes = c.votes || [];
+                const sla = getSLAInfo(c.createdAt);
+                return `
+      <div class="complaint-row${sla.overdue && c.status === 'pending' ? ' overdue' : ''}">
+        <div class="row-meta">
+          <span class="badge ${deptBadgeClass(c.department)}">${c.department}</span>
+          <span class="badge badge-${c.status}">${statusLabel(c.status)}</span>
+          ${votes.length > 1 ? `<span class="badge badge-votes">👥 ${votes.length} students</span>` : ''}
+          <span class="badge ${slaBadgeClass(sla.colorClass)}">⏱ ${sla.label}</span>
+        </div>
+        <div class="row-text">${escHtml(c.text)}</div>
+        ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;">📸 View Evidence</a></div>` : ''}
+        ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;">📍 View Location Map</a></div>` : ''}
+        ${votes.length > 1 ? `<div class="voters-text">Reported by: ${votes.map(v => escHtml(v)).join(', ')}</div>` : ''}
+        ${c.status === 'rejected' && c.rejectionReason ? `<div class="rejection-box">Reason: ${escHtml(c.rejectionReason)}</div>` : ''}
+        <div class="row-footer">
+          <div class="row-meta-info">
+            <span>By ${c.authorName === 'Anonymous' ? '🕵️ Anon' : escHtml(c.authorName || 'Student')}</span>
+            <span>·</span>
+            <span>${formatTime(c.createdAt)}</span>
+          </div>
+          <div class="row-actions">
+            ${c.status === 'pending' ? `
+              <button class="btn btn-sm btn-approve" onclick="openApproveModal(${c.id})">✅ Approve & Forward</button>
+              <button class="btn btn-sm btn-reject"  onclick="openRejectModal(${c.id})">❌ Reject</button>` : ''}
+          </div>
+        </div>
+        ${renderCommentThread(c, 'authenticator', me)}
+      </div>`;
+            }).join('');
+        }
+
+        async function submitComment(cid, authorName, role) {
+            const input = document.getElementById(`comment-input-${cid}`);
+            if (!input || !input.value.trim()) return;
+            await addComment(cid, authorName, role, input.value.trim());
+            const __all = await getComplaints();
+            const c = __all.find(x => x.id === cid);
+            if (c) await addNotification('student', `Response on your ${c.department} complaint: "${input.value.trim().substring(0, 60)}"`, 'info', '💬');
+            showToast('Response added.', 'success');
+            renderList();
+        }
+
+        async function openApproveModal(id) {
+            pendingApproveId = id;
+            const __all = await getComplaints();
+            const c = __all.find(x => x.id === id);
+            document.getElementById('approve-preview').innerHTML = `<strong>${escHtml(c.department)}</strong> — ${escHtml(c.text.substring(0, 200))}`;
+            document.getElementById('approve-modal').style.display = 'flex';
+        }
+        async function confirmApprove() {
+            await updateComplaintStatus(pendingApproveId, 'approved');
+            const __all = await getComplaints();
+            const c = __all.find(x => x.id === pendingApproveId);
+            await addNotification('student', `Your ${c.department} complaint was verified and forwarded to Management.`, 'success', '✅');
+            showToast('Complaint forwarded to Management.', 'success');
+            closeModal('approve-modal'); renderStats(); renderList();
+        }
+
+        async function openRejectModal(id) {
+            pendingRejectId = id;
+            const __all = await getComplaints();
+            const c = __all.find(x => x.id === id);
+            document.getElementById('reject-preview').innerHTML = `<strong>${escHtml(c.department)}</strong> — ${escHtml(c.text.substring(0, 200))}`;
+            document.getElementById('reject-reason').value = '';
+            document.getElementById('reject-err').style.display = 'none';
+            document.getElementById('reject-modal').style.display = 'flex';
+            setTimeout(() => document.getElementById('reject-reason').focus(), 80);
+        }
+        async function confirmReject() {
+            const reason = document.getElementById('reject-reason').value.trim();
+            if (!reason) { document.getElementById('reject-err').style.display = 'block'; return; }
+            await rejectComplaint(pendingRejectId, reason);
+            const __all = await getComplaints();
+            const c = __all.find(x => x.id === pendingRejectId);
+            await addNotification('student', `Your ${c.department} complaint was rejected. Reason: "${reason.substring(0, 80)}"`, 'error', '❌');
+            showToast('Complaint rejected.', 'info');
+            closeModal('reject-modal'); renderStats(); renderList();
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; pendingApproveId = pendingRejectId = null; }
+
+        function deptBadgeClass(d) { return { Canteen: 'badge-dept-canteen', Academics: 'badge-dept-academics', Hostel: 'badge-dept-hostel', 'Library & Sports': 'badge-dept-library-sports', Security: 'badge-dept-security', Transportation: 'badge-dept-transportation', Infrastructure: 'badge-dept-infrastructure', Cleanliness: 'badge-dept-cleanliness' }[d] || ''; }
+        function slaBadgeClass(c) { return { 'sla-ok': 'badge-sla-ok', 'sla-warn': 'badge-sla-warn', 'sla-over': 'badge-sla-over' }[c] || 'badge-sla-ok'; }
+        function statusLabel(s) { return { pending: 'Pending', approved: 'Forwarded', resolved: 'Resolved', rejected: 'Rejected' }[s] || s; }
+
+        initNotificationBell('authenticator');
+        renderStats();
+        renderList();
+    </script>
+</body>
+
+</html>
