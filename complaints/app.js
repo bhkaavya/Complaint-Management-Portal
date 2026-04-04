@@ -17,7 +17,7 @@ const API_URL = '/api';
 
 // ─── Theme ───────────────────────────────────────────────────────
 function initTheme() {
-  const theme = localStorage.getItem('dtm_theme') || 'dark';
+  const theme = localStorage.getItem('app_theme') || 'dark';
   document.documentElement.dataset.theme = theme;
   updateThemeIcon();
 }
@@ -25,7 +25,7 @@ function toggleTheme() {
   const current = document.documentElement.dataset.theme || 'dark';
   const next = current === 'dark' ? 'light' : 'dark';
   document.documentElement.dataset.theme = next;
-  localStorage.setItem('dtm_theme', next);
+  localStorage.setItem('app_theme', next);
   updateThemeIcon();
 }
 function updateThemeIcon() {
@@ -87,7 +87,7 @@ async function addComment(complaintId, authorName, role, text) {
 async function getNotifications(forRole) {
   return await apiRequest(`/notifications${forRole ? `?forRole=${forRole}` : ''}`);
 }
-async function addNotification(forRole, message, type = 'info', icon = 'ℹ️') {
+async function addNotification(forRole, message, type = 'info', icon = '<i class="ph ph-info"></i>') {
   return await apiRequest('/notifications', 'POST', { forRole, message, type, icon });
 }
 async function markNotificationRead(id) {
@@ -103,12 +103,12 @@ async function getUnreadCount(forRole) {
 
 // ─── Session ─────────────────────────────────────────────────────
 function getSession() {
-  return JSON.parse(sessionStorage.getItem('dtm_session') || 'null');
+  return JSON.parse(sessionStorage.getItem('app_session') || 'null');
 }
 function setSession(role, name, dept) {
-  sessionStorage.setItem('dtm_session', JSON.stringify({ role, name, dept, loginTime: Date.now() }));
+  sessionStorage.setItem('app_session', JSON.stringify({ role, name, dept, loginTime: Date.now() }));
 }
-function clearSession() { sessionStorage.removeItem('dtm_session'); }
+function clearSession() { sessionStorage.removeItem('app_session'); }
 function logout() { clearSession(); window.location.href = 'index.html'; }
 function requireRole(role) {
   const session = getSession();
@@ -118,7 +118,7 @@ function requireRole(role) {
 
 // ─── Toast ───────────────────────────────────────────────────────
 function showToast(message, type = 'info', icon = null) {
-  const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+  const icons = { success: '<i class="ph ph-check-circle"></i>', error: '<i class="ph ph-x-circle"></i>', info: '<i class="ph ph-info"></i>', warning: '<i class="ph ph-warning"></i>' };
   const container = document.getElementById('toast-container') || createToastContainer();
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
@@ -244,7 +244,7 @@ function renderCommentThread(complaint, inputRole, inputName) {
 
 // ─── Theme Management ────────────────────────────────────────────
 function initTheme() {
-  const saved = localStorage.getItem('dtm_theme') || 'dark';
+  const saved = localStorage.getItem('app_theme') || 'dark';
   document.documentElement.setAttribute('data-theme', saved);
   updateThemeIcon(saved);
 }
@@ -253,7 +253,7 @@ function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme');
   const next = current === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('dtm_theme', next);
+  localStorage.setItem('app_theme', next);
   updateThemeIcon(next);
 }
 

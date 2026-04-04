@@ -107,7 +107,7 @@ if (!appJs.includes('initTheme()')) {
   const themeLogic = `
 // ─── Theme Management ────────────────────────────────────────────
 function initTheme() {
-  const saved = localStorage.getItem('dtm_theme') || 'dark';
+  const saved = localStorage.getItem('app_theme') || 'dark';
   document.documentElement.setAttribute('data-theme', saved);
   updateThemeIcon(saved);
 }
@@ -116,7 +116,7 @@ function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme');
   const next = current === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('dtm_theme', next);
+  localStorage.setItem('app_theme', next);
   updateThemeIcon(next);
 }
 
@@ -134,7 +134,7 @@ window.addEventListener('DOMContentLoaded', initTheme);
 
 // --- 3. Update HTML files ---
 const htmlFiles = ['index.html', 'student.html', 'admin.html', 'authenticator.html'];
-const toggleBtn = `    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">☀️</button>\n`;
+const toggleBtn = `    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme"><i class="ph ph-sun" id="theme-icon"></i></button>\n`;
 
 for (const file of htmlFiles) {
   const fPath = path.join(__dirname, file);

@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Management — DTM Portal</title>
+    <title>Management Portal</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
@@ -14,24 +15,24 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-logo">
-                <div class="logo-mark">🏫</div>
-                <div class="brand">DTM Portal<span>Management View</span></div>
+                <div class="logo-mark"><i class="ph ph-buildings"></i></div>
+                <div class="brand">Campus Portal<span>Management View</span></div>
             </div>
             <nav class="sidebar-nav">
                 <div class="nav-section-label">Analytics</div>
                 <button class="nav-item active" id="nav-dashboard" onclick="showSection('dashboard')">
-                    <span class="nav-icon">📊</span> Dashboard
+                    <span class="nav-icon"><i class="ph ph-chart-bar"></i></span> Dashboard
                 </button>
                 <div class="nav-section-label">Complaints</div>
                 <button class="nav-item" id="nav-forwarded" onclick="showSection('forwarded')">
-                    <span class="nav-icon">📥</span> Forwarded
+                    <span class="nav-icon"><i class="ph ph-tray-arrow-down"></i></span> Forwarded
                     <span class="nav-badge" id="nav-fwd-count" style="display:none;"></span>
                 </button>
                 <button class="nav-item rose" id="nav-rejected" onclick="showSection('rejected')">
-                    <span class="nav-icon">❌</span> Rejected
+                    <span class="nav-icon"><i class="ph ph-x-circle"></i></span> Rejected
                 </button>
                 <button class="nav-item emerald" id="nav-resolved" onclick="showSection('resolved')">
-                    <span class="nav-icon">✅</span> Resolved
+                    <span class="nav-icon"><i class="ph ph-check-circle"></i></span> Resolved
                 </button>
             </nav>
             <div class="sidebar-user">
@@ -51,10 +52,10 @@
                     <div class="topbar-subtitle" id="topbar-sub">Complaint analytics and management</div>
                 </div>
                 <div class="topbar-right">
-    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">☀️</button>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme"><i class="ph ph-sun" id="theme-icon"></i></button>
 
                     <div class="notif-wrapper">
-                        <div class="notif-bell" id="notif-bell">🔔
+                        <div class="notif-bell" id="notif-bell"><i class="ph ph-bell"></i>
                             <span class="notif-count" id="notif-count" style="display:none;"></span>
                         </div>
                         <div class="notif-drop" id="notif-drop"></div>
@@ -71,7 +72,7 @@
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;">
                         <div class="section-card">
                             <div class="section-card-header">
-                                <h3>🍩 Status Distribution</h3>
+                                <h3><i class="ph ph-chart-pie-slice"></i> Status Distribution</h3>
                             </div>
                             <div class="section-card-body">
                                 <div class="chart-container">
@@ -83,7 +84,7 @@
                         </div>
                         <div class="section-card">
                             <div class="section-card-header">
-                                <h3>🏛️ By Department</h3>
+                                <h3><i class="ph ph-bank"></i> By Department</h3>
                             </div>
                             <div class="section-card-body" id="dept-breakdown"></div>
                         </div>
@@ -94,7 +95,7 @@
                 <div id="section-forwarded" style="display:none;">
                     <div class="section-card">
                         <div class="section-card-header">
-                            <h3>📥 Forwarded — Awaiting Resolution</h3>
+                            <h3><i class="ph ph-tray-arrow-down"></i> Forwarded — Awaiting Resolution</h3>
                             <span id="fwd-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
                         </div>
                         <div class="section-card-body" id="fwd-list"></div>
@@ -105,7 +106,7 @@
                 <div id="section-rejected" style="display:none;">
                     <div class="section-card">
                         <div class="section-card-header">
-                            <h3>❌ Rejected Complaints</h3>
+                            <h3><i class="ph ph-x-circle"></i> Rejected Complaints</h3>
                             <span id="rej-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
                         </div>
                         <div class="section-card-body" id="rej-list"></div>
@@ -116,7 +117,7 @@
                 <div id="section-resolved" style="display:none;">
                     <div class="section-card">
                         <div class="section-card-header">
-                            <h3>✅ Resolved Archive</h3>
+                            <h3><i class="ph ph-check-circle"></i> Resolved Archive</h3>
                             <span id="res-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
                         </div>
                         <div class="section-card-body" id="res-list"></div>
@@ -137,11 +138,11 @@
             <div id="res-preview"
                 style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:1.5rem;color:var(--text-muted);">
             </div>
-            <button class="btn btn-success btn-lg" onclick="confirmResolve()">🎉 Mark Resolved</button>
+            <button class="btn btn-success btn-lg" onclick="confirmResolve()"><i class="ph ph-check-circle"></i> Mark Resolved</button>
             <button class="btn btn-ghost  btn-lg" style="margin-top:0.5rem;"
 
                     <div class="notif-wrapper">
-                        <div class="notif-bell" id="notif-bell">🔔
+                        <div class="notif-bell" id="notif-bell"><i class="ph ph-bell"></i>
                             <span class="notif-count" id="notif-count" style="display:none;"></span>
                         </div>
                         <div class="notif-drop" id="notif-drop"></div>
@@ -158,7 +159,7 @@
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;">
                         <div class="section-card">
                             <div class="section-card-header">
-                                <h3>🍩 Status Distribution</h3>
+                                <h3><i class="ph ph-chart-pie-slice"></i> Status Distribution</h3>
                             </div>
                             <div class="section-card-body">
                                 <div class="chart-container">
@@ -170,7 +171,7 @@
                         </div>
                         <div class="section-card">
                             <div class="section-card-header">
-                                <h3>🏛️ By Department</h3>
+                                <h3><i class="ph ph-bank"></i> By Department</h3>
                             </div>
                             <div class="section-card-body" id="dept-breakdown"></div>
                         </div>
@@ -181,7 +182,7 @@
                 <div id="section-forwarded" style="display:none;">
                     <div class="section-card">
                         <div class="section-card-header">
-                            <h3>📥 Forwarded — Awaiting Resolution</h3>
+                            <h3><i class="ph ph-tray-arrow-down"></i> Forwarded — Awaiting Resolution</h3>
                             <span id="fwd-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
                         </div>
                         <div class="section-card-body" id="fwd-list"></div>
@@ -192,7 +193,7 @@
                 <div id="section-rejected" style="display:none;">
                     <div class="section-card">
                         <div class="section-card-header">
-                            <h3>❌ Rejected Complaints</h3>
+                            <h3><i class="ph ph-x-circle"></i> Rejected Complaints</h3>
                             <span id="rej-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
                         </div>
                         <div class="section-card-body" id="rej-list"></div>
@@ -203,7 +204,7 @@
                 <div id="section-resolved" style="display:none;">
                     <div class="section-card">
                         <div class="section-card-header">
-                            <h3>✅ Resolved Archive</h3>
+                            <h3><i class="ph ph-check-circle"></i> Resolved Archive</h3>
                             <span id="res-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
                         </div>
                         <div class="section-card-body" id="res-list"></div>
@@ -224,7 +225,7 @@
             <div id="res-preview"
                 style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:1.5rem;color:var(--text-muted);">
             </div>
-            <button class="btn btn-success btn-lg" onclick="confirmResolve()">🎉 Mark Resolved</button>
+            <button class="btn btn-success btn-lg" onclick="confirmResolve()"><i class="ph ph-check-circle"></i> Mark Resolved</button>
             <button class="btn btn-ghost  btn-lg" style="margin-top:0.5rem;"
                 onclick="closeResolveModal()">Cancel</button>
         </div>
@@ -273,7 +274,7 @@
             fwdBadge.textContent = a; fwdBadge.style.display = a > 0 ? 'inline-block' : 'none';
             document.getElementById('stats-grid').innerHTML = `
       <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(245,158,11,0.12);">📋</div>
+        <div class="stat-icon" style="background:rgba(245,158,11,0.12);"><i class="ph ph-list-clipboard"></i></div>
         <div class="stat-info"><div class="stat-val" style="color:var(--amber);">${p}</div><div class="stat-lbl">Pending</div></div>
       </div>
       <div class="stat-card">
@@ -281,15 +282,15 @@
         <div class="stat-info"><div class="stat-val" style="color:var(--indigo-l);">${a}</div><div class="stat-lbl">Forwarded</div></div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(16,185,129,0.12);">✅</div>
+        <div class="stat-icon" style="background:rgba(16,185,129,0.12);"><i class="ph ph-check-circle"></i></div>
         <div class="stat-info"><div class="stat-val" style="color:var(--emerald);">${r}</div><div class="stat-lbl">Resolved</div></div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(244,63,94,0.12);">❌</div>
+        <div class="stat-icon" style="background:rgba(244,63,94,0.12);"><i class="ph ph-x-circle"></i></div>
         <div class="stat-info"><div class="stat-val" style="color:#fb7185;">${x}</div><div class="stat-lbl">Rejected</div></div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(255,255,255,0.05);">📊</div>
+        <div class="stat-icon" style="background:rgba(255,255,255,0.05);"><i class="ph ph-chart-bar"></i></div>
         <div class="stat-info"><div class="stat-val" style="color:var(--text-muted);">${all.length}</div><div class="stat-lbl">Total</div></div>
       </div>`;
         }
@@ -330,7 +331,7 @@
             const sorted = Object.entries(depts).sort((a, b) => b[1] - a[1]);
             const total = all.length || 1;
             const el = document.getElementById('dept-breakdown');
-            if (!sorted.length) { el.innerHTML = `<div class="empty-state"><div class="ei">📊</div><p>No data yet</p></div>`; return; }
+            if (!sorted.length) { el.innerHTML = `<div class="empty-state"><div class="ei"><i class="ph ph-chart-bar"></i></div><p>No data yet</p></div>`; return; }
             el.innerHTML = sorted.map(([dept, count], i) => `
       <div class="dept-bar-row">
         <div class="dept-bar-top">
@@ -347,7 +348,7 @@
             const fwd = (await getComplaints(session.dept)).filter(c => c.status === 'approved').sort((a, b) => (b.votes || []).length - (a.votes || []).length);
             document.getElementById('fwd-count').textContent = `${fwd.length} complaint${fwd.length !== 1 ? 's' : ''}`;
             const el = document.getElementById('fwd-list');
-            if (!fwd.length) { el.innerHTML = `<div class="empty-state"><div class="ei">📭</div><p>No forwarded complaints awaiting resolution.</p></div>`; return; }
+            if (!fwd.length) { el.innerHTML = `<div class="empty-state"><div class="ei"><i class="ph ph-envelope-simple-open" style="font-size:2rem;"></i></div><p>No forwarded complaints awaiting resolution.</p></div>`; return; }
             const me = session ? session.name : 'Management';
             el.innerHTML = fwd.map(c => {
                 const votes = c.votes || [];
@@ -357,20 +358,20 @@
         <div class="row-meta">
           <span class="badge ${deptBadgeClass(c.department)}">${c.department}</span>
           <span class="badge badge-approved">Forwarded</span>
-          ${votes.length > 1 ? `<span class="badge badge-votes">👥 ${votes.length} students</span>` : ''}
-          <span class="badge ${slaBadgeClass(sla.colorClass)}">⏱ ${sla.label}</span>
+          ${votes.length > 1 ? `<span class="badge badge-votes"><i class="ph ph-users"></i> ${votes.length} students</span>` : ''}
+          <span class="badge ${slaBadgeClass(sla.colorClass)}"><i class="ph ph-clock"></i> ${sla.label}</span>
         </div>
         <div class="row-text">${escHtml(c.text)}</div>
-        ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;">📸 View Evidence</a></div>` : ''}
-        ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;">📍 View Location Map</a></div>` : ''}
+        ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;"><i class="ph ph-camera"></i> View Evidence</a></div>` : ''}
+        ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;"><i class="ph ph-map-pin"></i> View Location Map</a></div>` : ''}
         ${votes.length > 1 ? `<div class="voters-text">Reported by: ${votes.map(v => escHtml(v)).join(', ')}</div>` : ''}
         <div class="row-footer">
           <div class="row-meta-info">
-            <span>By ${c.authorName === 'Anonymous' ? '🕵️ Anon' : escHtml(c.authorName || 'Student')}</span>
+            <span>By ${c.authorName === 'Anonymous' ? '<i class="ph ph-detective"></i> Anon' : escHtml(c.authorName || 'Student')}</span>
             <span>·</span><span>Submitted ${formatTime(c.createdAt)}</span>
             ${c.approvedAt ? `<span>· Forwarded ${formatTime(c.approvedAt)}</span>` : ''}
           </div>
-          <button class="btn btn-sm btn-resolve" onclick="openResolveModal(${c.id})">🎉 Mark Resolved</button>
+          <button class="btn btn-sm btn-resolve" onclick="openResolveModal(${c.id})"><i class="ph ph-check-circle"></i> Mark Resolved</button>
         </div>
         ${renderCommentThread(c, 'admin', me)}
       </div>`;
@@ -381,7 +382,7 @@
             const rej = (await getComplaints(session.dept)).filter(c => c.status === 'rejected').reverse();
             document.getElementById('rej-count').textContent = `${rej.length} complaint${rej.length !== 1 ? 's' : ''}`;
             const el = document.getElementById('rej-list');
-            if (!rej.length) { el.innerHTML = `<div class="empty-state"><div class="ei">📭</div><p>No rejected complaints.</p></div>`; return; }
+            if (!rej.length) { el.innerHTML = `<div class="empty-state"><div class="ei"><i class="ph ph-envelope-simple-open" style="font-size:2rem;"></i></div><p>No rejected complaints.</p></div>`; return; }
             el.innerHTML = rej.map(c => `
       <div class="complaint-row">
         <div class="row-meta">
@@ -389,12 +390,12 @@
           <span class="badge badge-rejected">Rejected</span>
         </div>
         <div class="row-text">${escHtml(c.text)}</div>
-        ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;">📸 View Evidence</a></div>` : ''}
-        ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;">📍 View Location Map</a></div>` : ''}
+        ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;"><i class="ph ph-camera"></i> View Evidence</a></div>` : ''}
+        ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;"><i class="ph ph-map-pin"></i> View Location Map</a></div>` : ''}
         ${c.rejectionReason ? `<div class="rejection-box">Reason: ${escHtml(c.rejectionReason)}</div>` : ''}
         <div class="row-footer">
           <div class="row-meta-info">
-            <span>By ${c.authorName === 'Anonymous' ? '🕵️ Anon' : escHtml(c.authorName || 'Student')}</span>
+            <span>By ${c.authorName === 'Anonymous' ? '<i class="ph ph-detective"></i> Anon' : escHtml(c.authorName || 'Student')}</span>
             <span>·</span><span>Submitted ${formatTime(c.createdAt)}</span>
             ${c.rejectedAt ? `<span>· Rejected ${formatTime(c.rejectedAt)}</span>` : ''}
           </div>
@@ -407,20 +408,20 @@
             const res = (await getComplaints(session.dept)).filter(c => c.status === 'resolved').reverse();
             document.getElementById('res-count').textContent = `${res.length} complaint${res.length !== 1 ? 's' : ''}`;
             const el = document.getElementById('res-list');
-            if (!res.length) { el.innerHTML = `<div class="empty-state"><div class="ei">🎯</div><p>No resolved complaints yet.</p></div>`; return; }
+            if (!res.length) { el.innerHTML = `<div class="empty-state"><div class="ei"><i class="ph ph-target" style="font-size:2rem;"></i></div><p>No resolved complaints yet.</p></div>`; return; }
             el.innerHTML = res.map(c => `
       <div class="complaint-row">
         <div class="row-meta">
           <span class="badge ${deptBadgeClass(c.department)}">${c.department}</span>
           <span class="badge badge-resolved">Resolved</span>
-          ${(c.votes || []).length > 1 ? `<span class="badge badge-votes">👥 ${c.votes.length} students</span>` : ''}
+          ${(c.votes || []).length > 1 ? `<span class="badge badge-votes"><i class="ph ph-users"></i> ${c.votes.length} students</span>` : ''}
         </div>
         <div class="row-text">${escHtml(c.text)}</div>
-        ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;">📸 View Evidence</a></div>` : ''}
-        ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;">📍 View Location Map</a></div>` : ''}
+        ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;"><i class="ph ph-camera"></i> View Evidence</a></div>` : ''}
+        ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;"><i class="ph ph-map-pin"></i> View Location Map</a></div>` : ''}
         <div class="row-footer">
           <div class="row-meta-info">
-            <span>By ${c.authorName === 'Anonymous' ? '🕵️ Anon' : escHtml(c.authorName || 'Student')}</span>
+            <span>By ${c.authorName === 'Anonymous' ? '<i class="ph ph-detective"></i> Anon' : escHtml(c.authorName || 'Student')}</span>
             <span>·</span><span>Submitted ${formatTime(c.createdAt)}</span>
             ${c.resolvedAt ? `<span>· Resolved ${formatTime(c.resolvedAt)}</span>` : ''}
           </div>
@@ -453,7 +454,7 @@
             await updateComplaintStatus(pendingResolveId, 'resolved');
             const __all = await getComplaints(session ? session.dept : null);
             const c = __all.find(x => x.id === pendingResolveId);
-            await addNotification('student', `Your ${c.department} complaint has been resolved. 🎉`, 'success', '🎉');
+            await addNotification('student', `Your ${c.department} complaint has been resolved. <i class="ph ph-check-circle"></i>`, 'success', '<i class="ph ph-check-circle"></i>');
             showToast('Complaint resolved!', 'success');
             closeResolveModal(); renderAll();
         }

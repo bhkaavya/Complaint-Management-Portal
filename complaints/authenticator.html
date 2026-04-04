@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Authenticator — DTM Portal</title>
+    <title>Authenticator Portal</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="styles.css" />
 </head>
 
@@ -13,24 +14,24 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-logo">
-                <div class="logo-mark">🏫</div>
-                <div class="brand">DTM Portal<span>Authenticator View</span></div>
+                <div class="logo-mark"><i class="ph ph-buildings"></i></div>
+                <div class="brand">Campus Portal<span>Authenticator View</span></div>
             </div>
 
             <nav class="sidebar-nav">
                 <div class="nav-section-label">Queue</div>
                 <button class="nav-item amber active" id="nav-pending" onclick="switchTab('pending')">
-                    <span class="nav-icon">⏳</span> Pending
+                    <span class="nav-icon"><i class="ph ph-hourglass"></i></span> Pending
                     <span class="nav-badge" id="nav-pending-count"></span>
                 </button>
                 <button class="nav-item" id="nav-approved" onclick="switchTab('approved')">
-                    <span class="nav-icon">✅</span> Forwarded
+                    <span class="nav-icon"><i class="ph ph-check-circle"></i></span> Forwarded
                 </button>
                 <button class="nav-item rose" id="nav-rejected" onclick="switchTab('rejected')">
-                    <span class="nav-icon">❌</span> Rejected
+                    <span class="nav-icon"><i class="ph ph-x-circle"></i></span> Rejected
                 </button>
                 <button class="nav-item emerald" id="nav-resolved" onclick="switchTab('resolved')">
-                    <span class="nav-icon">🎉</span> Resolved
+                    <span class="nav-icon"><i class="ph ph-check-circle"></i></span> Resolved
                 </button>
             </nav>
 
@@ -52,10 +53,10 @@
                     <div class="topbar-subtitle" id="topbar-sub">Review and action each complaint below</div>
                 </div>
                 <div class="topbar-right">
-    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">☀️</button>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme"><i class="ph ph-sun" id="theme-icon"></i></button>
 
                     <div class="notif-wrapper">
-                        <div class="notif-bell" id="notif-bell">🔔
+                        <div class="notif-bell" id="notif-bell"><i class="ph ph-bell"></i>
                             <span class="notif-count" id="notif-count" style="display:none;"></span>
                         </div>
                         <div class="notif-drop" id="notif-drop"></div>
@@ -71,13 +72,13 @@
                 <div class="section-card">
                     <div style="border-bottom:1px solid var(--border);">
                         <div class="tabs-bar" id="tabs-bar">
-                            <button class="tab-btn active" id="tab-pending" onclick="switchTab('pending')">⏳
+                            <button class="tab-btn active" id="tab-pending" onclick="switchTab('pending')"><i class="ph ph-hourglass"></i>
                                 Pending</button>
-                            <button class="tab-btn" id="tab-approved" onclick="switchTab('approved')">✅
+                            <button class="tab-btn" id="tab-approved" onclick="switchTab('approved')"><i class="ph ph-check-circle"></i>
                                 Forwarded</button>
-                            <button class="tab-btn" id="tab-rejected" onclick="switchTab('rejected')">❌
+                            <button class="tab-btn" id="tab-rejected" onclick="switchTab('rejected')"><i class="ph ph-x-circle"></i>
                                 Rejected</button>
-                            <button class="tab-btn" id="tab-resolved" onclick="switchTab('resolved')">🎉
+                            <button class="tab-btn" id="tab-resolved" onclick="switchTab('resolved')"><i class="ph ph-check-circle"></i>
                                 Resolved</button>
                         </div>
                     </div>
@@ -98,7 +99,7 @@
             <div id="approve-preview"
                 style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:1.5rem;color:var(--text-muted);">
             </div>
-            <button class="btn btn-primary btn-lg" onclick="confirmApprove()">✅ Approve & Forward</button>
+            <button class="btn btn-primary btn-lg" onclick="confirmApprove()"><i class="ph ph-check-circle"></i> Approve & Forward</button>
             <button class="btn btn-ghost  btn-lg" style="margin-top:0.5rem;"
                 onclick="closeModal('approve-modal')">Cancel</button>
         </div>
@@ -123,7 +124,7 @@
             <p class="err-msg" id="reject-err">Please provide a reason before rejecting.</p>
 
                     <div class="notif-wrapper">
-                        <div class="notif-bell" id="notif-bell">🔔
+                        <div class="notif-bell" id="notif-bell"><i class="ph ph-bell"></i>
                             <span class="notif-count" id="notif-count" style="display:none;"></span>
                         </div>
                         <div class="notif-drop" id="notif-drop"></div>
@@ -139,13 +140,13 @@
                 <div class="section-card">
                     <div style="border-bottom:1px solid var(--border);">
                         <div class="tabs-bar" id="tabs-bar">
-                            <button class="tab-btn active" id="tab-pending" onclick="switchTab('pending')">⏳
+                            <button class="tab-btn active" id="tab-pending" onclick="switchTab('pending')"><i class="ph ph-hourglass"></i>
                                 Pending</button>
-                            <button class="tab-btn" id="tab-approved" onclick="switchTab('approved')">✅
+                            <button class="tab-btn" id="tab-approved" onclick="switchTab('approved')"><i class="ph ph-check-circle"></i>
                                 Forwarded</button>
-                            <button class="tab-btn" id="tab-rejected" onclick="switchTab('rejected')">❌
+                            <button class="tab-btn" id="tab-rejected" onclick="switchTab('rejected')"><i class="ph ph-x-circle"></i>
                                 Rejected</button>
-                            <button class="tab-btn" id="tab-resolved" onclick="switchTab('resolved')">🎉
+                            <button class="tab-btn" id="tab-resolved" onclick="switchTab('resolved')"><i class="ph ph-check-circle"></i>
                                 Resolved</button>
                         </div>
                     </div>
@@ -166,7 +167,7 @@
             <div id="approve-preview"
                 style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:1.5rem;color:var(--text-muted);">
             </div>
-            <button class="btn btn-primary btn-lg" onclick="confirmApprove()">✅ Approve & Forward</button>
+            <button class="btn btn-primary btn-lg" onclick="confirmApprove()"><i class="ph ph-check-circle"></i> Approve & Forward</button>
             <button class="btn btn-ghost  btn-lg" style="margin-top:0.5rem;"
                 onclick="closeModal('approve-modal')">Cancel</button>
         </div>
@@ -189,7 +190,7 @@
                     style="min-height:80px;"></textarea>
             </div>
             <p class="err-msg" id="reject-err">Please provide a reason before rejecting.</p>
-            <button class="btn btn-danger btn-lg" onclick="confirmReject()">❌ Reject Complaint</button>
+            <button class="btn btn-danger btn-lg" onclick="confirmReject()"><i class="ph ph-x-circle"></i> Reject Complaint</button>
             <button class="btn btn-ghost btn-lg" style="margin-top:0.5rem;"
                 onclick="closeModal('reject-modal')">Cancel</button>
         </div>
@@ -224,7 +225,7 @@
 
             document.getElementById('stats-grid').innerHTML = `
       <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(245,158,11,0.12);">⏳</div>
+        <div class="stat-icon" style="background:rgba(245,158,11,0.12);"><i class="ph ph-hourglass"></i></div>
         <div class="stat-info"><div class="stat-val" style="color:var(--amber);">${p}</div><div class="stat-lbl">Awaiting Review</div></div>
       </div>
       <div class="stat-card">
@@ -232,11 +233,11 @@
         <div class="stat-info"><div class="stat-val" style="color:var(--indigo-l);">${a}</div><div class="stat-lbl">Forwarded</div></div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(244,63,94,0.12);">❌</div>
+        <div class="stat-icon" style="background:rgba(244,63,94,0.12);"><i class="ph ph-x-circle"></i></div>
         <div class="stat-info"><div class="stat-val" style="color:#fb7185;">${r}</div><div class="stat-lbl">Rejected</div></div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(16,185,129,0.12);">🎉</div>
+        <div class="stat-icon" style="background:rgba(16,185,129,0.12);"><i class="ph ph-check-circle"></i></div>
         <div class="stat-info"><div class="stat-val" style="color:var(--emerald);">${d}</div><div class="stat-lbl">Resolved</div></div>
       </div>`;
         }
@@ -249,7 +250,7 @@
 
             if (!filtered.length) {
                 const msgs = { pending: 'All caught up — no pending complaints.', approved: 'No forwarded complaints.', rejected: 'No rejected complaints.', resolved: 'No resolved complaints yet.' };
-                listEl.innerHTML = `<div class="empty-state"><div class="ei">${currentTab === 'pending' ? '✅' : '📭'}</div><p>${msgs[currentTab]}</p></div>`;
+                listEl.innerHTML = `<div class="empty-state"><div class="ei">${currentTab === 'pending' ? '<i class="ph ph-check-circle"></i>' : '<i class="ph ph-envelope-simple-open" style="font-size:2rem;"></i>'}</div><p>${msgs[currentTab]}</p></div>`;
                 return;
             }
 
@@ -262,24 +263,24 @@
         <div class="row-meta">
           <span class="badge ${deptBadgeClass(c.department)}">${c.department}</span>
           <span class="badge badge-${c.status}">${statusLabel(c.status)}</span>
-          ${votes.length > 1 ? `<span class="badge badge-votes">👥 ${votes.length} students</span>` : ''}
-          <span class="badge ${slaBadgeClass(sla.colorClass)}">⏱ ${sla.label}</span>
+          ${votes.length > 1 ? `<span class="badge badge-votes"><i class="ph ph-users"></i> ${votes.length} students</span>` : ''}
+          <span class="badge ${slaBadgeClass(sla.colorClass)}"><i class="ph ph-clock"></i> ${sla.label}</span>
         </div>
         <div class="row-text">${escHtml(c.text)}</div>
-        ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;">📸 View Evidence</a></div>` : ''}
-        ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;">📍 View Location Map</a></div>` : ''}
+        ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;"><i class="ph ph-camera"></i> View Evidence</a></div>` : ''}
+        ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;"><i class="ph ph-map-pin"></i> View Location Map</a></div>` : ''}
         ${votes.length > 1 ? `<div class="voters-text">Reported by: ${votes.map(v => escHtml(v)).join(', ')}</div>` : ''}
         ${c.status === 'rejected' && c.rejectionReason ? `<div class="rejection-box">Reason: ${escHtml(c.rejectionReason)}</div>` : ''}
         <div class="row-footer">
           <div class="row-meta-info">
-            <span>By ${c.authorName === 'Anonymous' ? '🕵️ Anon' : escHtml(c.authorName || 'Student')}</span>
+            <span>By ${c.authorName === 'Anonymous' ? '<i class="ph ph-detective"></i> Anon' : escHtml(c.authorName || 'Student')}</span>
             <span>·</span>
             <span>${formatTime(c.createdAt)}</span>
           </div>
           <div class="row-actions">
             ${c.status === 'pending' ? `
-              <button class="btn btn-sm btn-approve" onclick="openApproveModal(${c.id})">✅ Approve & Forward</button>
-              <button class="btn btn-sm btn-reject"  onclick="openRejectModal(${c.id})">❌ Reject</button>` : ''}
+              <button class="btn btn-sm btn-approve" onclick="openApproveModal(${c.id})"><i class="ph ph-check-circle"></i> Approve & Forward</button>
+              <button class="btn btn-sm btn-reject"  onclick="openRejectModal(${c.id})"><i class="ph ph-x-circle"></i> Reject</button>` : ''}
           </div>
         </div>
         ${renderCommentThread(c, 'authenticator', me)}
@@ -309,7 +310,7 @@
             await updateComplaintStatus(pendingApproveId, 'approved');
             const __all = await getComplaints();
             const c = __all.find(x => x.id === pendingApproveId);
-            await addNotification('student', `Your ${c.department} complaint was verified and forwarded to Management.`, 'success', '✅');
+            await addNotification('student', `Your ${c.department} complaint was verified and forwarded to Management.`, 'success', '<i class="ph ph-check-circle"></i>');
             showToast('Complaint forwarded to Management.', 'success');
             closeModal('approve-modal'); renderStats(); renderList();
         }
@@ -330,7 +331,7 @@
             await rejectComplaint(pendingRejectId, reason);
             const __all = await getComplaints();
             const c = __all.find(x => x.id === pendingRejectId);
-            await addNotification('student', `Your ${c.department} complaint was rejected. Reason: "${reason.substring(0, 80)}"`, 'error', '❌');
+            await addNotification('student', `Your ${c.department} complaint was rejected. Reason: "${reason.substring(0, 80)}"`, 'error', '<i class="ph ph-x-circle"></i>');
             showToast('Complaint rejected.', 'info');
             closeModal('reject-modal'); renderStats(); renderList();
         }

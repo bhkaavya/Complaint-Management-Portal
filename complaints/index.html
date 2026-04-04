@@ -4,25 +4,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DTM — Complaint Management Portal</title>
+  <title>Complaint Management Portal</title>
   <meta name="description"
-    content="DTM College complaint management portal. Login as Student, Authenticator or Management." />
+    content="Campus complaint management portal. Login as Student, Authenticator or Management." />
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
   <div class="login-page">
-        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">☀️</button>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme"><i class="ph ph-sun" id="theme-icon"></i></button>
     <div class="login-logo">
-      <div class="logo-mark">🏫</div>
-      <span>DTM Portal</span>
+      <div class="logo-mark"><i class="ph ph-buildings"></i></div>
+      <span>Campus Portal</span>
     </div>
     <p class="login-tagline">Complaint Management System · Select your role to continue</p>
 
     <div class="login-cards">
       <div class="login-card student" onclick="openLogin('student')">
         <div class="lc-top">
-          <div class="lc-icon">🎓</div>
+          <div class="lc-icon"><i class="ph ph-graduation-cap"></i></div>
           <span class="lc-arrow">→</span>
         </div>
         <h3>Student Portal</h3>
@@ -35,7 +36,7 @@
 
       <div class="login-card auth" onclick="openLogin('authenticator')">
         <div class="lc-top">
-          <div class="lc-icon">🔍</div>
+          <div class="lc-icon"><i class="ph ph-shield-check"></i></div>
           <span class="lc-arrow">→</span>
         </div>
         <h3>Authenticator</h3>
@@ -48,7 +49,7 @@
 
       <div class="login-card admin" onclick="openLogin('admin')">
         <div class="lc-top">
-          <div class="lc-icon">📊</div>
+          <div class="lc-icon"><i class="ph ph-chart-bar"></i></div>
           <span class="lc-arrow">→</span>
         </div>
         <h3>Management</h3>

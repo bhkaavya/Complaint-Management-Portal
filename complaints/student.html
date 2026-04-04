@@ -4,21 +4,21 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Student Portal — DTM</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>Student Portal</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>\n    <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
     <nav class="student-navbar">
         <div class="brand">
-            <div class="logo-mark">🏫</div>
-            <span>DTM Portal <span style="color:var(--text-faint);font-weight:400;">/ Student</span></span>
+            <div class="logo-mark"><i class="ph ph-buildings"></i></div>
+            <span>Campus Portal <span style="color:var(--text-faint);font-weight:400;">/ Student</span></span>
         </div>
         <div style="display:flex;align-items:center;gap:0.75rem;">
-    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">☀️</button>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme"><i class="ph ph-sun" id="theme-icon"></i></button>
 
             <div class="notif-wrapper">
-                <div class="notif-bell" id="notif-bell">🔔
+                <div class="notif-bell" id="notif-bell"><i class="ph ph-bell"></i>
                     <span class="notif-count" id="notif-count" style="display:none;"></span>
                 </div>
                 <div class="notif-drop" id="notif-drop"></div>
@@ -31,20 +31,20 @@
     <div class="student-layout">
         <!-- Submit Form -->
         <div class="submit-card">
-            <h3>📝 Submit a Complaint</h3>
+            <h3><i class="ph ph-note-pencil"></i> Submit a Complaint</h3>
             <div class="field">
                 <label>Department</label>
                 <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 0.5rem 0;">Choose the department most relevant to your issue.</p>
                 <select id="dept-select" onchange="onDeptChange()">
                     <option value="">— Select department —</option>
-                    <option value="Canteen">🍽️ Canteen</option>
-                    <option value="Academics">📚 Academics</option>
-                    <option value="Hostel">🏠 Hostel</option>
-                    <option value="Library & Sports">📖⚽ Library & Sports</option>
-                    <option value="Security">🛡️ Security</option>
-                    <option value="Transportation">🚌 Transportation</option>
-                    <option value="Infrastructure">🏗️ Infrastructure</option>
-                    <option value="Cleanliness">🧹 Cleanliness</option>
+                    <option value="Canteen">Canteen</option>
+                    <option value="Academics">Academics</option>
+                    <option value="Hostel">Hostel</option>
+                    <option value="Library & Sports">Library & Sports</option>
+                    <option value="Security">Security</option>
+                    <option value="Transportation">Transportation</option>
+                    <option value="Infrastructure">Infrastructure</option>
+                    <option value="Cleanliness">Cleanliness</option>
                 </select>
             </div>
             
@@ -53,7 +53,7 @@
                 <select id="sub-problem-select">
 
             <div class="notif-wrapper">
-                <div class="notif-bell" id="notif-bell">🔔
+                <div class="notif-bell" id="notif-bell"><i class="ph ph-bell"></i>
                     <span class="notif-count" id="notif-count" style="display:none;"></span>
                 </div>
                 <div class="notif-drop" id="notif-drop"></div>
@@ -66,20 +66,20 @@
     <div class="student-layout">
         <!-- Submit Form -->
         <div class="submit-card">
-            <h3>📝 Submit a Complaint</h3>
+            <h3><i class="ph ph-note-pencil"></i> Submit a Complaint</h3>
             <div class="field">
                 <label>Department</label>
                 <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 0.5rem 0;">Choose the department most relevant to your issue.</p>
                 <select id="dept-select" onchange="onDeptChange()">
                     <option value="">— Select department —</option>
-                    <option value="Canteen">🍽️ Canteen</option>
-                    <option value="Academics">📚 Academics</option>
-                    <option value="Hostel">🏠 Hostel</option>
-                    <option value="Library & Sports">📖⚽ Library & Sports</option>
-                    <option value="Security">🛡️ Security</option>
-                    <option value="Transportation">🚌 Transportation</option>
-                    <option value="Infrastructure">🏗️ Infrastructure</option>
-                    <option value="Cleanliness">🧹 Cleanliness</option>
+                    <option value="Canteen">Canteen</option>
+                    <option value="Academics">Academics</option>
+                    <option value="Hostel">Hostel</option>
+                    <option value="Library & Sports">Library & Sports</option>
+                    <option value="Security">Security</option>
+                    <option value="Transportation">Transportation</option>
+                    <option value="Infrastructure">Infrastructure</option>
+                    <option value="Cleanliness">Cleanliness</option>
                 </select>
             </div>
             
@@ -104,7 +104,7 @@
                     <div style="margin-top:0.75rem;">
                         <label style="font-size:0.8rem;">Geolocation (Optional)</label>
                         <br/>
-                        <button class="btn btn-sm btn-ghost" style="margin-top:0.25rem; border:1px solid var(--border);" onclick="getGeoLocation(event)">📍 Capture Current Location</button>
+                        <button class="btn btn-sm btn-ghost" style="margin-top:0.25rem; border:1px solid var(--border);" onclick="getGeoLocation(event)"><i class="ph ph-map-pin"></i> Capture Current Location</button>
                         <div id="geo-status" style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;"></div>
                         <input type="hidden" id="geo-tag" value="" />
                     </div>
@@ -119,12 +119,12 @@
         <!-- My Submissions -->
         <div class="section-card">
             <div class="section-card-header">
-                <h3>📋 My Submissions</h3>
+                <h3><i class="ph ph-list-clipboard"></i> My Submissions</h3>
                 <span id="sub-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
             </div>
             <div class="section-card-body" id="submissions-list">
                 <div class="empty-state">
-                    <div class="ei">📭</div>
+                    <div class="ei"><i class="ph ph-envelope-simple-open" style="font-size:2rem;"></i></div>
                     <p>No complaints submitted yet.</p>
                 </div>
             </div>
@@ -169,7 +169,7 @@
             const voted = votes.includes(myName);
             dupArea.innerHTML = `
         <div class="dup-banner">
-          <div class="dup-banner-title">⚠️ Similar Issue Already Reported</div>
+          <div class="dup-banner-title"><i class="ph ph-warning"></i> Similar Issue Already Reported</div>
           <div class="dup-banner-body">
             A <strong>${dept}</strong> complaint is already <strong>${statusLabel(existing.status)}</strong>.
             ${votes.length > 1 ? `<strong>${votes.length} students</strong> have already reported this.` : ''}
@@ -178,8 +178,8 @@
           <div class="dup-existing">"${escHtml(existing.text.substring(0, 160))}${existing.text.length > 160 ? '…' : ''}"</div>
           <div class="dup-actions">
             ${voted
-                    ? `<button class="btn btn-sm" style="opacity:0.5;cursor:not-allowed;border:1px solid var(--border);color:var(--text-muted);" disabled>👍 Already Supported (${votes.length})</button>`
-                    : `<button class="btn btn-sm btn-approve" onclick="doUpvote(${existing.id})">👍 I have this issue too · ${votes.length} report${votes.length !== 1 ? 's' : ''}</button>`}
+                    ? `<button class="btn btn-sm" style="opacity:0.5;cursor:not-allowed;border:1px solid var(--border);color:var(--text-muted);" disabled><i class="ph ph-thumbs-up"></i> Already Supported (${votes.length})</button>`
+                    : `<button class="btn btn-sm btn-approve" onclick="doUpvote(${existing.id})"><i class="ph ph-thumbs-up"></i> I have this issue too · ${votes.length} report${votes.length !== 1 ? 's' : ''}</button>`}
             <button class="btn btn-sm btn-ghost" onclick="showNewForm()">My issue is different →</button>
           </div>
         </div>`;
@@ -188,7 +188,7 @@
 
         async function doUpvote(id) {
             await upvoteComplaint(id, (session ? session.name : 'Student'));
-            showToast('Your support added to existing complaint.', 'success', '👍');
+            showToast('Your support added to existing complaint.', 'success', '<i class="ph ph-thumbs-up"></i>');
             document.getElementById('dept-select').value = '';
             document.getElementById('dup-area').innerHTML = '';
             document.getElementById('new-form-section').style.display = 'block';
@@ -241,10 +241,10 @@
                 (pos) => {
                     const tag = `${pos.coords.latitude},${pos.coords.longitude}`;
                     inputEl.value = tag;
-                    statusEl.textContent = `✅ Location captured: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+                    statusEl.textContent = `<i class="ph ph-check-circle"></i> Location captured: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
                 },
                 (err) => {
-                    statusEl.textContent = `❌ Error: ${err.message}`;
+                    statusEl.textContent = `<i class="ph ph-x-circle"></i> Error: ${err.message}`;
                 }
             );
         }
@@ -253,7 +253,7 @@
             const list = document.getElementById('submissions-list');
             const all = await getComplaints();
             document.getElementById('sub-count').textContent = `${all.length} submission${all.length !== 1 ? 's' : ''}`;
-            if (!all.length) { list.innerHTML = `<div class="empty-state"><div class="ei">📭</div><p>No complaints submitted yet.</p></div>`; return; }
+            if (!all.length) { list.innerHTML = `<div class="empty-state"><div class="ei"><i class="ph ph-envelope-simple-open" style="font-size:2rem;"></i></div><p>No complaints submitted yet.</p></div>`; return; }
             list.innerHTML = [...all].reverse().map(c => {
                 const sla = getSLAInfo(c.createdAt);
                 const votes = c.votes || [];
@@ -262,14 +262,14 @@
           <div class="row-meta">
             <span class="badge ${deptBadgeClass(c.department)}">${c.department}</span>
             <span class="badge ${statusBadgeClass(c.status)}">${statusLabel(c.status)}</span>
-            ${votes.length > 1 ? `<span class="badge badge-votes">👥 ${votes.length} students</span>` : ''}
-            <span class="badge ${slaBadgeClass(sla.colorClass.replace('sla-', ''))}">⏱ ${sla.label}</span>
+            ${votes.length > 1 ? `<span class="badge badge-votes"><i class="ph ph-users"></i> ${votes.length} students</span>` : ''}
+            <span class="badge ${slaBadgeClass(sla.colorClass.replace('sla-', ''))}"><i class="ph ph-clock"></i> ${sla.label}</span>
           </div>
           ${c.subProblem ? `<div style="font-size:0.75rem;font-weight:600;color:var(--text-muted);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">↳ ${c.subProblem}</div>` : ''}
           <div class="row-text">${escHtml(c.text)}</div>
-          ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;">📸 View Evidence</a></div>` : ''}
-          ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;">📍 View Location Map</a></div>` : ''}
-          ${c.status === 'rejected' && c.rejectionReason ? `<div class="rejection-box">❌ <strong>Rejected:</strong> ${escHtml(c.rejectionReason)}</div>` : ''}
+          ${c.imageUrl ? `<div style="margin-top:0.5rem;"><a href="${c.imageUrl}" target="_blank" style="font-size:0.75rem; color:var(--indigo-l); text-decoration:none;"><i class="ph ph-camera"></i> View Evidence</a></div>` : ''}
+          ${c.geotag ? `<div style="margin-top:0.25rem;"><a href="https://maps.google.com/?q=${c.geotag}" target="_blank" style="font-size:0.75rem; color:var(--emerald); text-decoration:none;"><i class="ph ph-map-pin"></i> View Location Map</a></div>` : ''}
+          ${c.status === 'rejected' && c.rejectionReason ? `<div class="rejection-box"><i class="ph ph-x-circle"></i> <strong>Rejected:</strong> ${escHtml(c.rejectionReason)}</div>` : ''}
           <div class="row-footer">
             <div class="row-meta-info">
               <span>Submitted ${formatTime(c.createdAt)}</span>
