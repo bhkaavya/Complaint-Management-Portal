@@ -10,8 +10,11 @@ const db = new Pool({
 
 const allowedEmailsToSeed = [
     { email: 'student@srmist.edu.in', role: 'student' },
-    { email: 'john@srmist.edu.in', role: 'student' },
-    { email: 'jane@srmist.edu.in', role: 'student' },
+    { email: 'bz0198@srmist.edu.in', role: 'student' },
+    { email: 'ab6789@srmist.edu.in', role: 'student' },
+    { email: 'cd1234@srmist.edu.in', role: 'student' },
+    { email: 'ef5678@srmist.edu.in', role: 'student' },
+    { email: 'gh9012@srmist.edu.in', role: 'authenticator' },
     { email: 'auth@srmist.edu.in', role: 'authenticator' },
     { email: 'canteen@srmist.edu.in', role: 'admin' },
     { email: 'academics@srmist.edu.in', role: 'admin' },
