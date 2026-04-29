@@ -48,6 +48,9 @@ async function apiRequest(endpoint, method = 'GET', body = null) {
 async function getComplaints(dept = null) {
   return await apiRequest(`/complaints${dept ? `?dept=${encodeURIComponent(dept)}` : ''}`);
 }
+async function getCategories() {
+  return await apiRequest('/categories');
+}
 async function addComplaint(department, subProblem, text, authorName, imageFile, geotag) {
   const formData = new FormData();
   formData.append('department', department);
@@ -95,6 +98,32 @@ async function markNotificationRead(id) {
 }
 async function markAllNotificationsRead(forRole) {
   return await apiRequest(`/notifications/read-all`, 'PUT', { forRole });
+}
+async function getAllowedEmails() {
+  return await apiRequest('/admin/allowed-emails');
+}
+async function addAllowedEmail(email, role) {
+  return await apiRequest('/admin/allowed-emails', 'POST', { email, role });
+}
+async function deleteAllowedEmail(id) {
+  return await apiRequest(`/admin/allowed-emails/${id}`, 'DELETE');
+}
+
+// ─── OTP Authentication ───────────────────────────────────────────
+async function sendRegistrationOtp(username, password, role, name, department) {
+  return await apiRequest('/register', 'POST', { username, password, role, name, department });
+}
+
+async function verifyRegistrationOtp(username, password, role, name, department, otp) {
+  return await apiRequest('/verify-registration', 'POST', { username, password, role, name, department, otp });
+}
+
+async function sendLoginOtp(username, role) {
+  return await apiRequest('/login-otp', 'POST', { username, role });
+}
+
+async function verifyLoginOtp(username, role, otp) {
+  return await apiRequest('/verify-login', 'POST', { username, role, otp });
 }
 async function getUnreadCount(forRole) {
   const notifs = await getNotifications(forRole);

@@ -33,21 +33,35 @@ const demoEmails = [
     'cleanliness@srmist.edu.in'
 ];
 
-const usersToSeed = allowedEmailsToSeed
-    .filter(m => demoEmails.includes(m.email))
-    .map(m => {
-        return {
-            username: m.email,
-            password: m.role === 'student' ? 'student123' : (m.role === 'admin' ? 'admin123' : 'auth123'),
-            role: m.role,
-            name: m.email.split('@')[0],
-            department: m.role === 'admin' ? m.email.split('@')[0].charAt(0).toUpperCase() + m.email.split('@')[0].slice(1) : null
-        };
-    });
+const categoryMap = {
+    'canteen': 'Cafeteria / Mess',
+    'academics': 'Academic / Faculty',
+    'hostel': 'Hostel / Residential',
+    'library': 'Extracurriculars',
+    'security': 'Campus Security',
+    'transport': 'Transport',
+    'infrastructure': 'Infrastructure',
+    'cleanliness': 'Hostel / Residential'
+};
+
+const usersToSeed = allowedEmailsToSeed.map(m => {
+    const prefix = m.email.split('@')[0];
+    return {
+        username: m.email,
+        password: m.role === 'student' ? 'student123' : (m.role === 'admin' ? 'admin123' : 'auth123'),
+        role: m.role,
+        name: prefix,
+        department: m.role === 'admin' ? (categoryMap[prefix] || 'Other') : null
+    };
+});
 
 // Custom overrides
-usersToSeed.find(u => u.username === 'student@srmist.edu.in').name = 'Student Portal';
-usersToSeed.find(u => u.username === 'auth@srmist.edu.in').name = 'Official Authenticator';
+const studentUser = usersToSeed.find(u => u.username === 'student@srmist.edu.in');
+if (studentUser) studentUser.name = 'Student Portal';
+
+const authUser = usersToSeed.find(u => u.username === 'auth@srmist.edu.in');
+if (authUser) authUser.name = 'Official Authenticator';
+
 
 const seedDB = async () => {
     try {
@@ -69,10 +83,20 @@ const seedDB = async () => {
                 department TEXT
             )
         `);
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS issues_categories (
+                "categoryId" TEXT PRIMARY KEY,
+                "categoryName" TEXT,
+                "departmentOwner" TEXT,
+                "commonIssues" TEXT,
+                priority TEXT
+            )
+        `);
 
         // Wipe existing tables representing these configurations
         await db.query("DELETE FROM allowed_emails");
         await db.query("DELETE FROM users");
+        await db.query("DELETE FROM issues_categories");
 
         // Insert allowed emails
         for (const m of allowedEmailsToSeed) {
@@ -90,7 +114,30 @@ const seedDB = async () => {
             );
         }
 
-        console.log(`Database seeded successfully with ${usersToSeed.length} allowed emails and users!`);
+        // Insert issues categories
+        const categories = [
+          ['CAT_01', 'Academic / Faculty', 'Dean of Academics', 'Attendance, Faculty, Course Material', 'High'],
+          ['CAT_02', 'Hostel / Residential', 'Chief Warden', 'Room Repair, Electricity, Water', 'High'],
+          ['CAT_03', 'Cafeteria / Mess', 'Food & Safety Comm.', 'Food Quality, Hygiene, Overcharging', 'Medium'],
+          ['CAT_04', 'IT & Lab Services', 'IT Support / SysAdmin', 'Software, Hardware, System Access', 'Medium'],
+          ['CAT_05', 'Transport', 'Transport Manager', 'Bus Timing, Driver, Route Changes', 'Medium'],
+          ['CAT_06', 'Research Labs', 'Lab Coordinator', 'Equipment, Reagents, Safety Gear', 'High'],
+          ['CAT_07', 'Extracurriculars', 'Cultural/Sports Head', 'Club Funds, Event Space, Equipment', 'Low'],
+          ['CAT_08', 'Infrastructure', 'Maintenance Dept', 'Civil Works, Lighting, Furniture', 'Low'],
+          ['CAT_09', 'Campus Security', 'Security Office', 'Lost & Found, Parking, Safety', 'Urgent'],
+          ['CAT_10', 'Academic / Faculty', 'Dean of Academics', 'Attendance, Faculty, Course Material', 'High'],
+          ['CAT_11', 'Placement Cell', 'Placement Officer', 'Registration, Company Updates', 'High'],
+          ['CAT_12', 'Finance / Accounts', 'Accounts Office', 'Fees, Refunds, Scholarship', 'Medium']
+        ];
+
+        for (const cat of categories) {
+          await db.query(
+            'INSERT INTO issues_categories ("categoryId", "categoryName", "departmentOwner", "commonIssues", priority) VALUES ($1, $2, $3, $4, $5)',
+            cat
+          );
+        }
+
+        console.log(`Database seeded successfully with ${usersToSeed.length} allowed emails and users, and ${categories.length} categories!`);
     } catch (err) {
         console.error("Error during seeding:", err.message);
     } finally {

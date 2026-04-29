@@ -4,6 +4,30 @@ const { Pool } = require('pg');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const nodemailer = require('nodemailer');
+
+// Configure Nodemailer
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+async function sendOtpEmail(email, otp) {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.log(`\n=== OTP EMAIL SIMULATION ===\nTo: ${email}\nOTP: ${otp}\n============================\n`);
+    return;
+  }
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Campus Portal - Your OTP Verification Code',
+    text: `Your OTP for the Campus Complaint Management Portal is: ${otp}\n\nThis code is valid for 5 minutes.`
+  };
+  await transporter.sendMail(mailOptions);
+}
 
 // Configure multer
 const storage = multer.diskStorage({
@@ -29,10 +53,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // PostgreSQL connection
 const db = new Pool({
-  database: 'dtm_complaints',
-  user: 'dtm_user',
-  password: 'yourpassword',
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT || 5432,
+  database: process.env.DB_NAME || 'dtm_complaints',
+  user: process.env.DB_USER || 'dtm_user',
+  password: process.env.DB_PASS || 'yourpassword',
 });
+
 
 
 // Database Initialization
@@ -78,6 +105,16 @@ const initDB = async () => {
     `);
 
     await db.query(`
+      CREATE TABLE IF NOT EXISTS issues_categories (
+        "categoryId" TEXT PRIMARY KEY,
+        "categoryName" TEXT,
+        "departmentOwner" TEXT,
+        "commonIssues" TEXT,
+        priority TEXT
+      )
+    `);
+
+    await db.query(`
       CREATE TABLE IF NOT EXISTS votes (
         complaint_id INTEGER REFERENCES complaints(id) ON DELETE CASCADE,
         "voterName" TEXT,
@@ -105,6 +142,15 @@ const initDB = async () => {
         icon TEXT,
         read INTEGER DEFAULT 0,
         "createdAt" TEXT
+      )
+    `);
+
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS otps (
+        id SERIAL PRIMARY KEY,
+        email TEXT,
+        otp TEXT,
+        expires_at TIMESTAMP
       )
     `);
 
@@ -147,25 +193,56 @@ const getExpandedComplaints = async (dept) => {
 
 // --- API Endpoints ---
 
-// Register
+// Register (Step 1: Validate & Send OTP)
 app.post('/api/register', async (req, res) => {
   const { username, password, role, name, department } = req.body;
-  if (!username || !password || !role)
-    return res.status(400).json({ error: 'Missing fields' });
+  if (!username || !password || !role) return res.status(400).json({ error: 'Missing fields' });
 
   const email = username.toLowerCase();
   
-  // Enforce college domain
   const COLLEGE_DOMAIN = '@srmist.edu.in';
   if (!email.endsWith(COLLEGE_DOMAIN)) {
     return res.status(400).json({ error: `Only college emails ending in ${COLLEGE_DOMAIN} are allowed.` });
   }
 
   try {
-    const { rows: allowedRows } = await db.query('SELECT * FROM allowed_emails WHERE email = $1', [email]);
-    if (allowedRows.length === 0) {
-      return res.status(403).json({ error: 'Email not authorized for access. Please contact administration.' });
+    if (role === 'admin' || role === 'authenticator') {
+      const { rows: allowedRows } = await db.query('SELECT * FROM allowed_emails WHERE email = $1', [email]);
+      if (allowedRows.length === 0 || allowedRows[0].role !== role) {
+        return res.status(403).json({ error: `Email not authorized for the ${role} role. Please contact administration.` });
+      }
     }
+
+    // Check if user already exists
+    const { rows: existingUsers } = await db.query('SELECT id FROM users WHERE username = $1', [email]);
+    if (existingUsers.length > 0) return res.status(409).json({ error: 'Email already registered' });
+
+    // Generate and store OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60000); // 5 minutes
+    
+    await db.query('DELETE FROM otps WHERE email = $1', [email]);
+    await db.query('INSERT INTO otps (email, otp, expires_at) VALUES ($1, $2, $3)', [email, otp, expiresAt]);
+    
+    await sendOtpEmail(email, otp);
+    
+    res.status(200).json({ success: true, message: 'OTP sent successfully. Verification required.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Verify Registration (Step 2)
+app.post('/api/verify-registration', async (req, res) => {
+  const { username, password, role, name, department, otp } = req.body;
+  if (!username || !otp || !password || !role) return res.status(400).json({ error: 'Missing fields' });
+  const email = username.toLowerCase();
+
+  try {
+    const { rows: otps } = await db.query('SELECT * FROM otps WHERE email = $1 AND otp = $2 AND expires_at > NOW() ORDER BY id DESC LIMIT 1', [email, otp]);
+    if (otps.length === 0) return res.status(400).json({ error: 'Invalid or expired OTP' });
+
+    await db.query('DELETE FROM otps WHERE email = $1', [email]);
 
     const { rows } = await db.query(
       `INSERT INTO users (username, password, role, name, department) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
@@ -173,27 +250,65 @@ app.post('/api/register', async (req, res) => {
     );
     res.status(201).json(rows[0]);
   } catch (err) {
-    if (err.code === '23505') { // PostgreSQL unique violation code
-      res.status(409).json({ error: 'Email already registered' });
-    } else {
-      res.status(500).json({ error: err.message });
-    }
+    res.status(500).json({ error: err.message });
   }
 });
 
-// Login
+// Login (Password Fallback)
 app.post('/api/login', async (req, res) => {
   const { username, password, role } = req.body;
-  if (!username || !password || !role)
-    return res.status(400).json({ error: 'Missing fields' });
+  if (!username || !password || !role) return res.status(400).json({ error: 'Missing fields' });
 
   try {
     const { rows } = await db.query(
       `SELECT * FROM users WHERE username = $1 AND password = $2 AND role = $3`,
       [username.toLowerCase(), password, role]
     );
-    if (rows.length === 0)
-      return res.status(401).json({ error: 'Invalid credentials' });
+    if (rows.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Login OTP Request (Alternative Login)
+app.post('/api/login-otp', async (req, res) => {
+  const { username, role } = req.body;
+  if (!username || !role) return res.status(400).json({ error: 'Missing fields' });
+  const email = username.toLowerCase();
+
+  try {
+    const { rows: users } = await db.query('SELECT id FROM users WHERE username = $1 AND role = $2', [email, role]);
+    if (users.length === 0) return res.status(404).json({ error: 'Account not found for this role. Please sign up.' });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60000);
+    
+    await db.query('DELETE FROM otps WHERE email = $1', [email]);
+    await db.query('INSERT INTO otps (email, otp, expires_at) VALUES ($1, $2, $3)', [email, otp, expiresAt]);
+    
+    await sendOtpEmail(email, otp);
+    res.status(200).json({ success: true, message: 'OTP sent for login' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Verify Login OTP
+app.post('/api/verify-login', async (req, res) => {
+  const { username, role, otp } = req.body;
+  if (!username || !role || !otp) return res.status(400).json({ error: 'Missing fields' });
+  const email = username.toLowerCase();
+
+  try {
+    const { rows: otps } = await db.query('SELECT * FROM otps WHERE email = $1 AND otp = $2 AND expires_at > NOW() ORDER BY id DESC LIMIT 1', [email, otp]);
+    if (otps.length === 0) return res.status(400).json({ error: 'Invalid or expired OTP' });
+
+    await db.query('DELETE FROM otps WHERE email = $1', [email]);
+
+    const { rows } = await db.query('SELECT * FROM users WHERE username = $1 AND role = $2', [email, role]);
+    if (rows.length === 0) return res.status(401).json({ error: 'Account not found' });
+    
     res.json(rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -206,6 +321,16 @@ app.get('/api/complaints', async (req, res) => {
     const { dept } = req.query;
     const complaints = await getExpandedComplaints(dept);
     res.json(complaints);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get Categories
+app.get('/api/categories', async (req, res) => {
+  try {
+    const { rows } = await db.query('SELECT * FROM issues_categories ORDER BY "categoryId"');
+    res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -379,6 +504,49 @@ app.put('/api/notifications/read-all', async (req, res) => {
   const { forRole } = req.body;
   try {
     await db.query(`UPDATE notifications SET read = 1 WHERE "forRole" = $1`, [forRole]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- Admin: Authorized Emails Management ---
+
+// Get all allowed emails
+app.get('/api/admin/allowed-emails', async (req, res) => {
+  try {
+    const { rows } = await db.query('SELECT * FROM allowed_emails ORDER BY email ASC');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Add a new allowed email
+app.post('/api/admin/allowed-emails', async (req, res) => {
+  const { email, role } = req.body;
+  if (!email || !role) return res.status(400).json({ error: 'Email and role are required' });
+  
+  try {
+    const { rows } = await db.query(
+      'INSERT INTO allowed_emails (email, role) VALUES ($1, $2) RETURNING *',
+      [email.toLowerCase(), role]
+    );
+    res.status(201).json(rows[0]);
+  } catch (err) {
+    if (err.code === '23505') {
+      res.status(409).json({ error: 'Email already in authorized list' });
+    } else {
+      res.status(500).json({ error: err.message });
+    }
+  }
+});
+
+// Remove an allowed email
+app.delete('/api/admin/allowed-emails/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.query('DELETE FROM allowed_emails WHERE id = $1', [id]);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
