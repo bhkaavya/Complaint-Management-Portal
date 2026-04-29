@@ -554,7 +554,7 @@ app.delete('/api/admin/allowed-emails/:id', async (req, res) => {
 });
 
 // Default route for single page app
-app.get('*', (req, res) => {
+app.get('/(.*)', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
