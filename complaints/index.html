@@ -28,10 +28,6 @@
         </div>
         <h3>Student Portal</h3>
         <p>Submit and track complaints across campus departments.</p>
-        <div class="lc-creds">
-          <div>Email: <code>student@srmist.edu.in</code></div>
-          <div>Password: <code>student123</code></div>
-        </div>
       </div>
 
       <div class="login-card auth" onclick="openLogin('authenticator')">
@@ -41,10 +37,6 @@
         </div>
         <h3>Authenticator</h3>
         <p>Review, verify and forward or reject student complaints.</p>
-        <div class="lc-creds">
-          <div>Email: <code>auth@srmist.edu.in</code></div>
-          <div>Password: <code>auth123</code></div>
-        </div>
       </div>
 
       <div class="login-card admin" onclick="openLogin('admin')">
@@ -54,10 +46,6 @@
         </div>
         <h3>Management</h3>
         <p>Monitor analytics for your department and resolve complaints.</p>
-        <div class="lc-creds">
-          <div>Email: <code>canteen@srmist.edu.in</code></div>
-          <div>(Or other admin emails ending in @srmist.edu.in)</div>
-        </div>
       </div>
     </div>
   </div>
@@ -69,19 +57,26 @@
         <h2 id="modal-title">Sign In</h2>
         <p id="modal-sub">Enter your credentials to continue</p>
       </div>
-      <div class="field">
+      <div class="field" id="field-email">
         <label>College Email</label>
         <input type="email" id="inp-user" placeholder="name@srmist.edu.in" autocomplete="username" />
       </div>
-      <div class="field">
+      <div class="field" id="field-pass">
         <label>Password</label>
         <input type="password" id="inp-pass" placeholder="Enter password" autocomplete="current-password"
           onkeydown="if(event.key==='Enter')doAuth()" />
       </div>
-      <p class="err-msg" id="login-err">Invalid email or password.</p>
+      <div class="field" id="field-otp" style="display:none;">
+        <label>Verification Code (OTP)</label>
+        <input type="text" id="inp-otp" placeholder="123456" autocomplete="one-time-code" onkeydown="if(event.key==='Enter')doAuth()" />
+        <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem;">Please check your college email for the 6-digit code.</p>
+      </div>
+      <p class="err-msg" id="login-err"></p>
       <button class="btn btn-primary btn-lg" id="btn-submit" style="margin-top:0.25rem;" onclick="doAuth()">Sign In →</button>
-      <div style="text-align:center; margin-top:0.75rem; font-size:0.85rem;">
+      <div style="text-align:center; margin-top:0.75rem; font-size:0.85rem;" id="toggle-container">
         <a href="#" id="toggle-auth" onclick="toggleAuthMode(); return false;" style="color:var(--indigo-l); text-decoration:none;">Don't have an account? Sign Up</a>
+        <br/><br/>
+        <a href="#" id="toggle-otp" onclick="toggleOtpMode(); return false;" style="color:var(--emerald); text-decoration:none;"><i class="ph ph-envelope-simple"></i> Login with Email OTP</a>
       </div>
       <button class="btn btn-ghost btn-lg" style="margin-top:0.5rem;" onclick="closeModal()">Cancel</button>
     </div>
@@ -96,27 +91,73 @@
 
     let currentRole = null;
     let authMode = 'login';
+    let loginMethod = 'password';
+    let awaitingOtp = false;
     const roleLabels = { student: '🎓 Student', authenticator: '🔍 Authenticator', admin: '📊 Management' };
+
+    function resetModalState() {
+      awaitingOtp = false;
+      document.getElementById('field-email').style.display = 'block';
+      document.getElementById('field-pass').style.display = loginMethod === 'password' ? 'block' : 'none';
+      document.getElementById('field-otp').style.display = 'none';
+      document.getElementById('toggle-container').style.display = 'block';
+      document.getElementById('inp-otp').value = '';
+      updateModalUI();
+    }
 
     function toggleAuthMode() {
       authMode = authMode === 'login' ? 'register' : 'login';
-      document.getElementById('modal-title').textContent = roleLabels[currentRole] + (authMode === 'login' ? ' Sign In' : ' Sign Up');
-      document.getElementById('btn-submit').innerHTML = authMode === 'login' ? 'Sign In →' : 'Create Account →';
-      document.getElementById('toggle-auth').textContent = authMode === 'login' ? "Don't have an account? Sign Up" : "Already have an account? Sign In";
-      document.getElementById('login-err').style.display = 'none';
+      loginMethod = 'password'; // reset to password for reg
+      resetModalState();
       document.getElementById('inp-pass').value = '';
       setTimeout(() => document.getElementById('inp-user').focus(), 50);
+    }
+
+    function toggleOtpMode() {
+      loginMethod = loginMethod === 'password' ? 'otp' : 'password';
+      resetModalState();
+    }
+
+    function updateModalUI() {
+      document.getElementById('login-err').style.display = 'none';
+      const title = document.getElementById('modal-title');
+      const btn = document.getElementById('btn-submit');
+      const authToggle = document.getElementById('toggle-auth');
+      const otpToggle = document.getElementById('toggle-otp');
+
+      title.textContent = roleLabels[currentRole] + (authMode === 'login' ? ' Sign In' : ' Sign Up');
+      authToggle.textContent = authMode === 'login' ? "Don't have an account? Sign Up" : "Already have an account? Sign In";
+      
+      if (authMode === 'register') {
+        otpToggle.style.display = 'none';
+        if (awaitingOtp) {
+          btn.innerHTML = '<i class="ph ph-check-circle"></i> Verify & Create Account';
+        } else {
+          btn.innerHTML = 'Sign Up →';
+        }
+      } else {
+        otpToggle.style.display = 'inline';
+        otpToggle.innerHTML = loginMethod === 'password' ? '<i class="ph ph-envelope-simple"></i> Login with Email OTP' : '<i class="ph ph-key"></i> Login with Password';
+        
+        if (loginMethod === 'otp') {
+          if (awaitingOtp) {
+            btn.innerHTML = '<i class="ph ph-check-circle"></i> Verify & Login';
+          } else {
+            btn.innerHTML = '<i class="ph ph-paper-plane-right"></i> Send OTP Code';
+          }
+        } else {
+          btn.innerHTML = 'Sign In →';
+        }
+      }
     }
 
     async function openLogin(role) {
       currentRole = role;
       authMode = 'login';
-      document.getElementById('modal-title').textContent = roleLabels[role] + ' Sign In';
-      document.getElementById('btn-submit').innerHTML = 'Sign In →';
-      document.getElementById('toggle-auth').textContent = "Don't have an account? Sign Up";
+      loginMethod = 'password';
+      resetModalState();
       document.getElementById('inp-user').value = '';
       document.getElementById('inp-pass').value = '';
-      document.getElementById('login-err').style.display = 'none';
       document.getElementById('login-modal').style.display = 'flex';
       setTimeout(() => document.getElementById('inp-user').focus(), 80);
     }
@@ -126,34 +167,80 @@
     async function doAuth() {
       const user = document.getElementById('inp-user').value.trim().toLowerCase();
       const pass = document.getElementById('inp-pass').value;
+      const otp = document.getElementById('inp-otp').value.trim();
       const errEl = document.getElementById('login-err');
       errEl.style.display = 'none';
       
-      const endpoint = authMode === 'login' ? '/api/login' : '/api/register';
+      const btn = document.getElementById('btn-submit');
+      const originalBtnText = btn.innerHTML;
+      btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Processing...';
+      btn.disabled = true;
 
       try {
+        let endpoint = '';
+        let payload = { username: user, role: currentRole };
+
+        if (authMode === 'register') {
+          if (!awaitingOtp) {
+            endpoint = '/api/register';
+            payload.password = pass;
+          } else {
+            endpoint = '/api/verify-registration';
+            payload.password = pass;
+            payload.otp = otp;
+          }
+        } else {
+          if (loginMethod === 'password') {
+            endpoint = '/api/login';
+            payload.password = pass;
+          } else { // login OTP
+            if (!awaitingOtp) {
+              endpoint = '/api/login-otp';
+            } else {
+              endpoint = '/api/verify-login';
+              payload.otp = otp;
+            }
+          }
+        }
+
         const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: user, password: pass, role: currentRole })
+          body: JSON.stringify(payload)
         });
         
         let data;
         try { data = await res.json(); } catch(e) {}
         
         if (!res.ok) { 
-          errEl.textContent = data ? data.error : 'Invalid email or password.';
-          errEl.style.display = 'block'; 
-          return; 
+          throw new Error(data ? data.error : 'Authentication failed.');
         }
-        
-        setSession(data.role || currentRole, data.name || user, data.department);
-        showToast(authMode === 'login' ? 'Welcome back!' : 'Account created successfully!', 'success');
-        const pages = { student: 'student.html', authenticator: 'authenticator.html', admin: 'admin.html' };
-        setTimeout(() => window.location.href = pages[data.role || currentRole], 500);
+
+        // Handle success
+        if (!awaitingOtp && ((authMode === 'register') || (authMode === 'login' && loginMethod === 'otp'))) {
+          // Move to OTP step
+          awaitingOtp = true;
+          document.getElementById('field-email').style.display = 'none';
+          document.getElementById('field-pass').style.display = 'none';
+          document.getElementById('field-otp').style.display = 'block';
+          document.getElementById('toggle-container').style.display = 'none';
+          updateModalUI();
+          showToast('OTP sent to your email!', 'success');
+          document.getElementById('inp-otp').focus();
+        } else {
+          // Login successful
+          setSession(data.role || currentRole, data.name || user, data.department);
+          showToast(authMode === 'login' ? 'Welcome back!' : 'Account created successfully!', 'success');
+          const pages = { student: 'student.html', authenticator: 'authenticator.html', admin: 'admin.html' };
+          setTimeout(() => window.location.href = pages[data.role || currentRole], 500);
+        }
       } catch (err) {
-        errEl.textContent = 'Server connection failed.';
+        errEl.textContent = err.message;
         errEl.style.display = 'block';
+      } finally {
+        btn.innerHTML = originalBtnText;
+        btn.disabled = false;
+        updateModalUI();
       }
     }
   </script>

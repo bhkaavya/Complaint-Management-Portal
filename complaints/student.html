@@ -45,6 +45,7 @@
                     <option value="Transportation">Transportation</option>
                     <option value="Infrastructure">Infrastructure</option>
                     <option value="Cleanliness">Cleanliness</option>
+                    <option value="Other">Other</option>
                 </select>
             </div>
             
@@ -52,40 +53,6 @@
                 <label>Sub-Problem</label>
                 <select id="sub-problem-select">
 
-            <div class="notif-wrapper">
-                <div class="notif-bell" id="notif-bell"><i class="ph ph-bell"></i>
-                    <span class="notif-count" id="notif-count" style="display:none;"></span>
-                </div>
-                <div class="notif-drop" id="notif-drop"></div>
-            </div>
-            <span style="font-size:0.78rem;color:var(--text-muted);" id="user-label"></span>
-            <button class="btn btn-sm btn-ghost" onclick="logout()">Sign Out</button>
-        </div>
-    </nav>
-
-    <div class="student-layout">
-        <!-- Submit Form -->
-        <div class="submit-card">
-            <h3><i class="ph ph-note-pencil"></i> Submit a Complaint</h3>
-            <div class="field">
-                <label>Department</label>
-                <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 0.5rem 0;">Choose the department most relevant to your issue.</p>
-                <select id="dept-select" onchange="onDeptChange()">
-                    <option value="">— Select department —</option>
-                    <option value="Canteen">Canteen</option>
-                    <option value="Academics">Academics</option>
-                    <option value="Hostel">Hostel</option>
-                    <option value="Library & Sports">Library & Sports</option>
-                    <option value="Security">Security</option>
-                    <option value="Transportation">Transportation</option>
-                    <option value="Infrastructure">Infrastructure</option>
-                    <option value="Cleanliness">Cleanliness</option>
-                </select>
-            </div>
-            
-            <div class="field" id="sub-problem-section" style="display: none;">
-                <label>Sub-Problem</label>
-                <select id="sub-problem-select">
                     <option value="">— Select sub-problem —</option>
                 </select>
             </div>
@@ -137,11 +104,28 @@
         const session = requireRole('student');
         if (session) document.getElementById('user-label').textContent = session.name;
 
-        function deptBadgeClass(d) {
-            return { Canteen: 'badge-dept-canteen', Academics: 'badge-dept-academics', Hostel: 'badge-dept-hostel', 'Library & Sports': 'badge-dept-library-sports', Security: 'badge-dept-security', Transportation: 'badge-dept-transportation', Infrastructure: 'badge-dept-infrastructure', Cleanliness: 'badge-dept-cleanliness' }[d] || '';
-        }
+        function deptBadgeClass(d) { return { 'Cafeteria / Mess': 'badge-dept-canteen', 'Academic / Faculty': 'badge-dept-academics', 'Hostel / Residential': 'badge-dept-hostel', 'Extracurriculars': 'badge-dept-library-sports', 'Campus Security': 'badge-dept-security', 'Transport': 'badge-dept-transportation', 'Infrastructure': 'badge-dept-infrastructure', 'IT & Lab Services': 'badge-dept-academics', 'Research Labs': 'badge-dept-academics', 'Placement Cell': 'badge-dept-library-sports', 'Finance / Accounts': 'badge-dept-infrastructure' }[d] || ''; }
         function statusBadgeClass(s) { return `badge-${s}`; }
         function slaBadgeClass(c) { return `badge-sla-${c}`; }
+
+        let dbCategories = [];
+        async function loadCategories() {
+            try {
+                dbCategories = await getCategories();
+                const deptSelect = document.getElementById('dept-select');
+                const uniqueCats = [];
+                const seen = new Set();
+                dbCategories.forEach(c => {
+                    if (!seen.has(c.categoryName)) {
+                        seen.add(c.categoryName);
+                        uniqueCats.push(c);
+                    }
+                });
+                deptSelect.innerHTML = '<option value="">— Select department —</option>' + 
+                    uniqueCats.map(c => `<option value="${c.categoryName}">${c.categoryName}</option>`).join('') +
+                    '<option value="Other">Other</option>';
+            } catch (e) { console.error('Failed to load categories', e); }
+        }
 
         async function onDeptChange() {
             const dept = document.getElementById('dept-select').value;
@@ -151,10 +135,14 @@
             const newSec = document.getElementById('new-form-section');
             document.getElementById('form-err').style.display = 'none';
 
-            // Handle Sub-Problem dropdown
-            if (dept && SUB_PROBLEMS[dept]) {
+            const category = dbCategories.find(c => c.categoryName === dept);
+
+            // Handle Sub-Problem dropdown from the database category
+            if (category && category.commonIssues) {
+                const issues = category.commonIssues.split(',').map(s => s.trim());
                 subProblemSelect.innerHTML = '<option value="">— Select sub-problem —</option>' + 
-                    SUB_PROBLEMS[dept].map(sp => `<option value="${sp}">${sp}</option>`).join('');
+                    issues.map(sp => `<option value="${sp}">${sp}</option>`).join('') +
+                    '<option value="Other">Other</option>';
                 subProblemSec.style.display = 'block';
             } else {
                 subProblemSec.style.display = 'none';
@@ -205,7 +193,8 @@
             const err = document.getElementById('form-err');
             err.style.display = 'none';
             if (!dept) { err.textContent = 'Please select a department.'; err.style.display = 'block'; return; }
-            if (SUB_PROBLEMS[dept] && !subProblem) { err.textContent = 'Please select a sub-problem.'; err.style.display = 'block'; return; }
+            const category = dbCategories.find(c => c.categoryName === dept);
+            if (category && category.commonIssues && !subProblem) { err.textContent = 'Please select a sub-problem.'; err.style.display = 'block'; return; }
             if (text.length < 10) { err.textContent = 'Complaint must be at least 10 characters.'; err.style.display = 'block'; return; }
             
             const isAnon = document.getElementById('anon-checkbox') && document.getElementById('anon-checkbox').checked;
@@ -252,9 +241,12 @@
         async function renderSubmissions() {
             const list = document.getElementById('submissions-list');
             const all = await getComplaints();
-            document.getElementById('sub-count').textContent = `${all.length} submission${all.length !== 1 ? 's' : ''}`;
-            if (!all.length) { list.innerHTML = `<div class="empty-state"><div class="ei"><i class="ph ph-envelope-simple-open" style="font-size:2rem;"></i></div><p>No complaints submitted yet.</p></div>`; return; }
-            list.innerHTML = [...all].reverse().map(c => {
+            const myName = session ? session.name : 'Student';
+            const myComplaints = all.filter(c => c.authorName === myName || (c.votes && c.votes.includes(myName)));
+            
+            document.getElementById('sub-count').textContent = `${myComplaints.length} submission${myComplaints.length !== 1 ? 's' : ''}`;
+            if (!myComplaints.length) { list.innerHTML = `<div class="empty-state"><div class="ei"><i class="ph ph-envelope-simple-open" style="font-size:2rem;"></i></div><p>No complaints submitted yet.</p></div>`; return; }
+            list.innerHTML = [...myComplaints].reverse().map(c => {
                 const sla = getSLAInfo(c.createdAt);
                 const votes = c.votes || [];
                 return `
@@ -283,7 +275,7 @@
         function statusLabel(s) { return { pending: 'Pending', approved: 'Forwarded', resolved: 'Resolved', rejected: 'Rejected' }[s] || s; }
 
         initNotificationBell('student');
-        renderSubmissions();
+        loadCategories().then(() => renderSubmissions());
     </script>
 </body>
 

@@ -122,81 +122,14 @@
                     style="min-height:80px;"></textarea>
             </div>
             <p class="err-msg" id="reject-err">Please provide a reason before rejecting.</p>
-
-                    <div class="notif-wrapper">
-                        <div class="notif-bell" id="notif-bell"><i class="ph ph-bell"></i>
-                            <span class="notif-count" id="notif-count" style="display:none;"></span>
-                        </div>
-                        <div class="notif-drop" id="notif-drop"></div>
-                    </div>
-                </div>
-            </header>
-
-            <div class="page-body">
-                <!-- Stats -->
-                <div class="stats-grid" id="stats-grid"></div>
-
-                <!-- Complaint List -->
-                <div class="section-card">
-                    <div style="border-bottom:1px solid var(--border);">
-                        <div class="tabs-bar" id="tabs-bar">
-                            <button class="tab-btn active" id="tab-pending" onclick="switchTab('pending')"><i class="ph ph-hourglass"></i>
-                                Pending</button>
-                            <button class="tab-btn" id="tab-approved" onclick="switchTab('approved')"><i class="ph ph-check-circle"></i>
-                                Forwarded</button>
-                            <button class="tab-btn" id="tab-rejected" onclick="switchTab('rejected')"><i class="ph ph-x-circle"></i>
-                                Rejected</button>
-                            <button class="tab-btn" id="tab-resolved" onclick="switchTab('resolved')"><i class="ph ph-check-circle"></i>
-                                Resolved</button>
-                        </div>
-                    </div>
-                    <div class="section-card-body" id="complaints-list"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Approve Modal -->
-    <div class="modal-overlay" id="approve-modal" style="display:none;"
-        onclick="if(event.target===this)closeModal('approve-modal')">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Approve & Forward</h2>
-                <p>This complaint will be verified and sent to Management for resolution.</p>
-            </div>
-            <div id="approve-preview"
-                style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:1.5rem;color:var(--text-muted);">
-            </div>
-            <button class="btn btn-primary btn-lg" onclick="confirmApprove()"><i class="ph ph-check-circle"></i> Approve & Forward</button>
-            <button class="btn btn-ghost  btn-lg" style="margin-top:0.5rem;"
-                onclick="closeModal('approve-modal')">Cancel</button>
-        </div>
-    </div>
-
-    <!-- Reject Modal -->
-    <div class="modal-overlay" id="reject-modal" style="display:none;"
-        onclick="if(event.target===this)closeModal('reject-modal')">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Reject Complaint</h2>
-                <p>Provide a clear reason so the student understands the decision.</p>
-            </div>
-            <div id="reject-preview"
-                style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:1rem;color:var(--text-muted);">
-            </div>
-            <div class="field">
-                <label>Rejection Reason *</label>
-                <textarea id="reject-reason" placeholder="e.g. Duplicate issue, Out of scope, Insufficient details…"
-                    style="min-height:80px;"></textarea>
-            </div>
-            <p class="err-msg" id="reject-err">Please provide a reason before rejecting.</p>
             <button class="btn btn-danger btn-lg" onclick="confirmReject()"><i class="ph ph-x-circle"></i> Reject Complaint</button>
-            <button class="btn btn-ghost btn-lg" style="margin-top:0.5rem;"
-                onclick="closeModal('reject-modal')">Cancel</button>
+            <button class="btn btn-ghost btn-lg" style="margin-top:0.5rem;" onclick="closeModal('reject-modal')">Cancel</button>
         </div>
     </div>
 
-    <div id="toast-container" class="toast-container"></div>    <script>
+    <div id="toast-container" class="toast-container"></div>
+    <script src="app.js"></script>
+    <script>
         const session = requireRole('authenticator');
         let currentTab = 'pending';
         let pendingApproveId = null;
@@ -338,7 +271,7 @@
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; pendingApproveId = pendingRejectId = null; }
 
-        function deptBadgeClass(d) { return { Canteen: 'badge-dept-canteen', Academics: 'badge-dept-academics', Hostel: 'badge-dept-hostel', 'Library & Sports': 'badge-dept-library-sports', Security: 'badge-dept-security', Transportation: 'badge-dept-transportation', Infrastructure: 'badge-dept-infrastructure', Cleanliness: 'badge-dept-cleanliness' }[d] || ''; }
+        function deptBadgeClass(d) { return { 'Cafeteria / Mess': 'badge-dept-canteen', 'Academic / Faculty': 'badge-dept-academics', 'Hostel / Residential': 'badge-dept-hostel', 'Extracurriculars': 'badge-dept-library-sports', 'Campus Security': 'badge-dept-security', 'Transport': 'badge-dept-transportation', 'Infrastructure': 'badge-dept-infrastructure', 'IT & Lab Services': 'badge-dept-academics', 'Research Labs': 'badge-dept-academics', 'Placement Cell': 'badge-dept-library-sports', 'Finance / Accounts': 'badge-dept-infrastructure' }[d] || ''; }
         function slaBadgeClass(c) { return { 'sla-ok': 'badge-sla-ok', 'sla-warn': 'badge-sla-warn', 'sla-over': 'badge-sla-over' }[c] || 'badge-sla-ok'; }
         function statusLabel(s) { return { pending: 'Pending', approved: 'Forwarded', resolved: 'Resolved', rejected: 'Rejected' }[s] || s; }
 

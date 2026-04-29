@@ -34,7 +34,11 @@
                 <button class="nav-item emerald" id="nav-resolved" onclick="showSection('resolved')">
                     <span class="nav-icon"><i class="ph ph-check-circle"></i></span> Resolved
                 </button>
+                <button class="nav-item" id="nav-access" onclick="showSection('access')">
+                    <span class="nav-icon"><i class="ph ph-lock-key"></i></span> Access Control
+                </button>
             </nav>
+
             <div class="sidebar-user">
                 <div class="user-avatar" style="background:rgba(16,185,129,0.15);color:#34d399;">M</div>
                 <div class="user-meta">
@@ -113,94 +117,38 @@
                     </div>
                 </div>
 
-                <!-- SECTION: Resolved -->
-                <div id="section-resolved" style="display:none;">
+                <!-- SECTION: Access Control -->
+                <div id="section-access" style="display:none;">
                     <div class="section-card">
                         <div class="section-card-header">
-                            <h3><i class="ph ph-check-circle"></i> Resolved Archive</h3>
-                            <span id="res-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
+                            <h3><i class="ph ph-lock-key"></i> Authorized Email List</h3>
+                            <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.25rem;">Only emails on this list can register for accounts.</p>
                         </div>
-                        <div class="section-card-body" id="res-list"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Resolve Modal -->
-    <div class="modal-overlay" id="resolve-modal" style="display:none;"
-        onclick="if(event.target===this)closeResolveModal()">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Mark as Resolved</h2>
-                <p>This will close the complaint lifecycle. The student will be notified.</p>
-            </div>
-            <div id="res-preview"
-                style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:1.5rem;color:var(--text-muted);">
-            </div>
-            <button class="btn btn-success btn-lg" onclick="confirmResolve()"><i class="ph ph-check-circle"></i> Mark Resolved</button>
-            <button class="btn btn-ghost  btn-lg" style="margin-top:0.5rem;"
-
-                    <div class="notif-wrapper">
-                        <div class="notif-bell" id="notif-bell"><i class="ph ph-bell"></i>
-                            <span class="notif-count" id="notif-count" style="display:none;"></span>
-                        </div>
-                        <div class="notif-drop" id="notif-drop"></div>
-                    </div>
-                </div>
-            </header>
-
-            <div class="page-body">
-                <!-- Stats row (always visible) -->
-                <div class="stats-grid" id="stats-grid"></div>
-
-                <!-- SECTION: Dashboard -->
-                <div id="section-dashboard">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;">
-                        <div class="section-card">
-                            <div class="section-card-header">
-                                <h3><i class="ph ph-chart-pie-slice"></i> Status Distribution</h3>
-                            </div>
-                            <div class="section-card-body">
-                                <div class="chart-container">
-                                    <canvas id="donut-chart" width="180" height="180"
-                                        style="max-width:180px;max-height:180px;"></canvas>
-                                    <div class="chart-legend" id="chart-legend"></div>
+                        <div class="section-card-body">
+                            <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;background:rgba(255,255,255,0.03);padding:1rem;border-radius:var(--radius-sm);border:1px solid var(--border);">
+                                <div style="flex:1;">
+                                    <label style="display:block;font-size:0.75rem;margin-bottom:0.4rem;color:var(--text-muted);">New Authorized Email</label>
+                                    <input type="email" id="new-auth-email" placeholder="student@srmist.edu.in" style="width:100%;background:var(--bg);border:1px solid var(--border);padding:0.6rem;border-radius:6px;color:var(--text);outline:none;" />
+                                </div>
+                                <div style="width:180px;">
+                                    <label style="display:block;font-size:0.75rem;margin-bottom:0.4rem;color:var(--text-muted);">Role</label>
+                                    <select id="new-auth-role" style="width:100%;background:var(--bg);border:1px solid var(--border);padding:0.6rem;border-radius:6px;color:var(--text);outline:none;">
+                                        <option value="student">Student</option>
+                                        <option value="authenticator">Authenticator</option>
+                                        <option value="admin">Management</option>
+                                    </select>
+                                </div>
+                                <div style="display:flex;align-items:flex-end;">
+                                    <button class="btn btn-primary" onclick="handleAddAuthEmail()" style="height:40px;padding:0 1.25rem;">Add Authorization</button>
                                 </div>
                             </div>
+                            <div id="access-list"></div>
                         </div>
-                        <div class="section-card">
-                            <div class="section-card-header">
-                                <h3><i class="ph ph-bank"></i> By Department</h3>
-                            </div>
-                            <div class="section-card-body" id="dept-breakdown"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECTION: Forwarded -->
-                <div id="section-forwarded" style="display:none;">
-                    <div class="section-card">
-                        <div class="section-card-header">
-                            <h3><i class="ph ph-tray-arrow-down"></i> Forwarded — Awaiting Resolution</h3>
-                            <span id="fwd-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
-                        </div>
-                        <div class="section-card-body" id="fwd-list"></div>
-                    </div>
-                </div>
-
-                <!-- SECTION: Rejected -->
-                <div id="section-rejected" style="display:none;">
-                    <div class="section-card">
-                        <div class="section-card-header">
-                            <h3><i class="ph ph-x-circle"></i> Rejected Complaints</h3>
-                            <span id="rej-count" style="font-size:0.75rem;color:var(--text-muted);"></span>
-                        </div>
-                        <div class="section-card-body" id="rej-list"></div>
                     </div>
                 </div>
 
                 <!-- SECTION: Resolved -->
+
                 <div id="section-resolved" style="display:none;">
                     <div class="section-card">
                         <div class="section-card-header">
@@ -226,8 +174,7 @@
                 style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:1.5rem;color:var(--text-muted);">
             </div>
             <button class="btn btn-success btn-lg" onclick="confirmResolve()"><i class="ph ph-check-circle"></i> Mark Resolved</button>
-            <button class="btn btn-ghost  btn-lg" style="margin-top:0.5rem;"
-                onclick="closeResolveModal()">Cancel</button>
+            <button class="btn btn-ghost  btn-lg" style="margin-top:0.5rem;" onclick="closeResolveModal()">Cancel</button>
         </div>
     </div>
 
@@ -253,11 +200,15 @@
 
         function showSection(name) {
             currentSection = name;
-            ['dashboard', 'forwarded', 'rejected', 'resolved'].forEach(s => {
-                document.getElementById(`section-${s}`).style.display = s === name ? 'block' : 'none';
-                document.getElementById(`nav-${s === 'forwarded' ? 'forwarded' : s}`).classList.toggle('active', s === name);
+            ['dashboard', 'forwarded', 'rejected', 'resolved', 'access'].forEach(s => {
+                const el = document.getElementById(`section-${s}`);
+                if(el) el.style.display = s === name ? 'block' : 'none';
+                
+                const navId = s === 'forwarded' ? 'nav-forwarded' : (s === 'access' ? 'nav-access' : `nav-${s}`);
+                const navEl = document.getElementById(navId);
+                if(navEl) navEl.classList.toggle('active', s === name);
             });
-            const titles = { dashboard: 'Dashboard', forwarded: 'Forwarded Complaints', rejected: 'Rejected Complaints', resolved: 'Resolved Archive' };
+            const titles = { dashboard: 'Dashboard', forwarded: 'Forwarded Complaints', rejected: 'Rejected Complaints', resolved: 'Resolved Archive', access: 'Access Control' };
             document.getElementById('topbar-title').textContent = titles[name];
             renderSection(name);
         }
@@ -300,6 +251,7 @@
             if (name === 'forwarded') renderForwarded();
             if (name === 'rejected') renderRejected();
             if (name === 'resolved') renderResolved();
+            if (name === 'access') renderAccessControl();
         }
 
         async function renderDonut() {
@@ -430,6 +382,66 @@
       </div>`).join('');
         }
 
+        async function renderAccessControl() {
+            const list = await getAllowedEmails();
+            const el = document.getElementById('access-list');
+            if (!list.length) {
+                el.innerHTML = '<div class="empty-state"><p>No authorized emails found.</p></div>';
+                return;
+            }
+            el.innerHTML = `
+                <table style="width:100%;border-collapse:collapse;margin-top:0.5rem;">
+                    <thead>
+                        <tr style="text-align:left;border-bottom:1px solid var(--border);font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">
+                            <th style="padding:0.75rem 1rem;">Email Address</th>
+                            <th style="padding:0.75rem 1rem;">Default Role</th>
+                            <th style="padding:0.75rem 1rem;text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${list.map(m => `
+                            <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+                                <td style="padding:0.85rem 1rem;font-size:0.9rem;">${escHtml(m.email)}</td>
+                                <td style="padding:0.85rem 1rem;">
+                                    <span class="badge ${m.role === 'admin' ? 'badge-dept-library-sports' : (m.role === 'authenticator' ? 'badge-approved' : '')}">${m.role}</span>
+                                </td>
+                                <td style="padding:0.85rem 1rem;text-align:right;">
+                                    <button class="btn btn-ghost" onclick="handleDeleteAuthEmail(${m.id})" style="color:#fb7185;padding:0.4rem;min-width:auto;"><i class="ph ph-trash"></i></button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        async function handleAddAuthEmail() {
+            const email = document.getElementById('new-auth-email').value.trim();
+            const role = document.getElementById('new-auth-role').value;
+            if (!email) return showToast('Please enter an email', 'error');
+            if (!email.endsWith('@srmist.edu.in')) return showToast('Must be a college email (@srmist.edu.in)', 'error');
+            
+            try {
+                await addAllowedEmail(email, role);
+                showToast('Authorization added successfully!', 'success');
+                document.getElementById('new-auth-email').value = '';
+                renderAccessControl();
+            } catch (err) {
+                showToast(err.message || 'Failed to add email', 'error');
+            }
+        }
+
+        async function handleDeleteAuthEmail(id) {
+            if (!confirm('Are you sure you want to remove this authorization? They will no longer be able to register.')) return;
+            try {
+                await deleteAllowedEmail(id);
+                showToast('Authorization removed.', 'success');
+                renderAccessControl();
+            } catch (err) {
+                showToast('Failed to remove authorization', 'error');
+            }
+        }
+
         // Comment submit (called from thread HTML)
         async function submitComment(cid, authorName, role) {
             const input = document.getElementById(`comment-input-${cid}`);
@@ -459,7 +471,7 @@
             closeResolveModal(); renderAll();
         }
 
-        function deptBadgeClass(d) { return { Canteen: 'badge-dept-canteen', Academics: 'badge-dept-academics', Hostel: 'badge-dept-hostel', 'Library & Sports': 'badge-dept-library-sports', Security: 'badge-dept-security', Transportation: 'badge-dept-transportation', Infrastructure: 'badge-dept-infrastructure', Cleanliness: 'badge-dept-cleanliness' }[d] || ''; }
+        function deptBadgeClass(d) { return { 'Cafeteria / Mess': 'badge-dept-canteen', 'Academic / Faculty': 'badge-dept-academics', 'Hostel / Residential': 'badge-dept-hostel', 'Extracurriculars': 'badge-dept-library-sports', 'Campus Security': 'badge-dept-security', 'Transport': 'badge-dept-transportation', 'Infrastructure': 'badge-dept-infrastructure', 'IT & Lab Services': 'badge-dept-academics', 'Research Labs': 'badge-dept-academics', 'Placement Cell': 'badge-dept-library-sports', 'Finance / Accounts': 'badge-dept-infrastructure' }[d] || ''; }
         function slaBadgeClass(c) { return { 'sla-ok': 'badge-sla-ok', 'sla-warn': 'badge-sla-warn', 'sla-over': 'badge-sla-over' }[c] || 'badge-sla-ok'; }
 
         initNotificationBell('admin');
